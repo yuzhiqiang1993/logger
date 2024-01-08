@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class JavaActivity extends AppCompatActivity {
 
+    private static final String TAG = "JavaActivity";
 
     @Nullable
     public static Intent createIntent(@NotNull Activity activity) {
@@ -22,7 +23,7 @@ public class JavaActivity extends AppCompatActivity {
     }
 
     private static void testLog() {
-
+        Logger.it(TAG, "JavaActivity testLog");
         Logger.e("JavaActivity testLog");
     }
 
@@ -30,7 +31,6 @@ public class JavaActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_java);
-
-        Logger.i("JavaActivity onCreate");
+        Logger.i("JavaActivity onCreate", "1111");
     }
 }

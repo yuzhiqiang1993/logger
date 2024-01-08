@@ -29,6 +29,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.google.material)
+    implementation(libs.moshiKotlin)
 //    implementation(libs.xeonyu.logger)
     implementation(project(":logger"))
 

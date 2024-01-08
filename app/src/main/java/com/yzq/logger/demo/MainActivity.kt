@@ -2,9 +2,9 @@ package com.yzq.logger.demo
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.yzq.logger.LogInfo
-import com.yzq.logger.LogObserver
+import com.yzq.logger.LogType
 import com.yzq.logger.Logger
+import com.yzq.logger.demo.data.User
 import com.yzq.logger.demo.databinding.ActivityMainBinding
 import org.json.JSONObject
 import kotlin.concurrent.thread
@@ -16,12 +16,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewbinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewbinding.root)
-        /*添加观察者*/
-        Logger.addObserver(object : LogObserver {
-            override fun log(info: LogInfo) {
-                println("log: ${info.msg}")
-            }
-        })
+
 
         /*打印*/
         Logger.v("onCreate")
@@ -30,10 +25,20 @@ class MainActivity : AppCompatActivity() {
         thread {
             Logger.i("onCreate")
         }
-        Logger.w("onCreate")
-        Logger.e("onCreate", tr = Exception("data error"))
+        Logger.w("onCreate", "111", 23132, arrayListOf("21312", 21131), mapOf(1 to 1, 3 to 3))
+        Logger.e("onCreate", Exception("data error"))
+
+        val user = User("yuzhiqiang", 18)
+
+        Logger.i("user", user)
+
+
         /*打印json*/
-        Logger.json(JSONObject().put("name", "yuzhiqiang").put("age", 18).toString())
+        Logger.json(
+            JSONObject().put("name", "yuzhiqiang").put("age", 18).toString(),
+            "onCreate",
+            LogType.ERROR
+        )
 
         viewbinding.btnSkip.setOnClickListener {
             startActivity(JavaActivity.createIntent(this))
