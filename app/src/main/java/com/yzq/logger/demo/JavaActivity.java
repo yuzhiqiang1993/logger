@@ -32,5 +32,6 @@ public class JavaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_java);
         Logger.i("JavaActivity onCreate", "1111");
+        Logger.it(TAG, "JavaActivity onCreate", "2222");
     }
 }

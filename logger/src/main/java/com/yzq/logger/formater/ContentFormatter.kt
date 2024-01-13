@@ -1,7 +1,7 @@
 package com.yzq.logger.formater
 
 import android.util.Log
-import com.yzq.logger.Logger
+import com.yzq.logger.LoggerConfig
 import com.yzq.logger.ext.firstStackTraceInfo
 
 
@@ -16,18 +16,20 @@ internal class ContentFormatter : IFormatter {
         }
     }
 
+
     /**
-     * 格式化最终要打印的日志内容
+     * 格式化内容
+     * @param config LoggerConfig
      * @param tag String
      * @param content Array<out Any>
      * @return String
      */
-    override fun formatToStr(tag: String, vararg content: Any): String {
+    override fun formatToStr(config: LoggerConfig, tag: String, vararg content: Any): String {
         val contentStr = parseContent(*content)
-        val threadName = if (Logger.config.showThreadInfo) Thread.currentThread().name else null
+        val threadName = if (config.showThreadInfo) Thread.currentThread().name else null
         val traceInfo =
-            if (Logger.config.showStackTrace) Throwable().firstStackTraceInfo() else null
-        return buildLogStr(tag, contentStr, threadName, traceInfo)
+            if (config.showStackTrace) Throwable().firstStackTraceInfo() else null
+        return buildLogStr(tag, contentStr, threadName, traceInfo, config)
     }
 
     /**
@@ -63,11 +65,12 @@ internal class ContentFormatter : IFormatter {
         contentStr: String,
         threadName: String?,
         traceInfo: String?,
+        config: LoggerConfig,
     ): String {
         val sb = StringBuilder()
         val separator = System.getProperty("line.separator") ?: "\n"
 
-        if (Logger.config.showBorder) {
+        if (config.showBorder) {
             sb.appendLine("┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────")
             sb.appendLine("│ ${buildLogHeaderStr(tag, threadName, traceInfo)}")
             sb.appendLine("├───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────")

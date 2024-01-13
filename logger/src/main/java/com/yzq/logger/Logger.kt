@@ -1,8 +1,10 @@
 package com.yzq.logger
 
+import com.yzq.logger.printer.AbsPrinter
 import org.json.JSONArray
 import org.json.JSONObject
 import org.json.JSONTokener
+import java.util.Collections
 
 
 /**
@@ -12,39 +14,49 @@ import org.json.JSONTokener
 
 object Logger {
 
-    //配置类
-    var config: LogConfig = LogConfig.Builder().build()
+    private val printerList = Collections.synchronizedList(arrayListOf<AbsPrinter>())
 
-    @JvmStatic
-    fun init(logConfig: LogConfig) {
-        this.config = logConfig
+    fun addPrinter(printer: AbsPrinter): Logger {
+        if (printerList.contains(printer)) {
+            return this
+        }
+        printerList.add(printer)
+        return this
+    }
+
+    fun removePrinter(printer: AbsPrinter) {
+        if (printerList.contains(printer)) {
+            printerList.remove(printer)
+        }
+    }
+
+    fun clearPrinter() {
+        printerList.clear()
     }
 
 
     @JvmStatic
     fun v(vararg content: Any) {
-        vt(config.tag, *content)
+        print(LogType.VERBOSE, content = content)
     }
 
 
-    @JvmOverloads
     @JvmStatic
     fun vt(
-        tag: String = config.tag,
+        tag: String,
         vararg content: Any,
     ) {
-        print(LogType.VERBOSE, tag, *content)
+        print(LogType.VERBOSE, tag, content)
     }
 
     @JvmStatic
     fun i(vararg content: Any) {
-        it(config.tag, *content)
+        print(LogType.INFO, content = content)
     }
 
-    @JvmOverloads
     @JvmStatic
     fun it(
-        tag: String = config.tag,
+        tag: String,
         vararg content: Any,
     ) {
         print(LogType.INFO, tag, *content)
@@ -52,16 +64,15 @@ object Logger {
 
     @JvmStatic
     fun d(vararg content: Any) {
-        dt(config.tag, *content)
+        print(LogType.DEBUG, content = content)
     }
 
-    @JvmOverloads
     @JvmStatic
     fun dt(
-        tag: String = config.tag,
+        tag: String,
         vararg content: Any,
     ) {
-        print(LogType.DEBUG, tag, *content)
+        print(LogType.DEBUG, tag, content)
     }
 
 
@@ -69,31 +80,29 @@ object Logger {
     fun w(
         vararg content: Any,
     ) {
-        wt(config.tag, *content)
+        print(LogType.WARN, content = content)
     }
 
-    @JvmOverloads
     @JvmStatic
     fun wt(
-        tag: String = config.tag,
+        tag: String,
         vararg content: Any,
     ) {
-        print(LogType.WARN, tag, *content)
+        print(LogType.WARN, tag, content)
     }
 
 
     @JvmStatic
     fun e(vararg content: Any) {
-        et(config.tag, *content)
+        print(LogType.ERROR, content = content)
     }
 
-    @JvmOverloads
     @JvmStatic
     fun et(
-        tag: String = config.tag,
+        tag: String,
         vararg content: Any,
     ) {
-        print(LogType.ERROR, tag, *content)
+        print(LogType.ERROR, tag, content)
     }
 
 
@@ -101,16 +110,15 @@ object Logger {
     fun wtf(
         vararg content: Any,
     ) {
-        wtft(config.tag, *content)
+        print(LogType.WTF, content = content)
     }
 
-    @JvmOverloads
     @JvmStatic
     fun wtft(
-        tag: String = config.tag,
+        tag: String,
         vararg content: Any,
     ) {
-        print(LogType.WTF, tag, *content)
+        print(LogType.WTF, tag, content)
     }
 
 
@@ -124,15 +132,16 @@ object Logger {
      * @param occurred 日志异常
      */
     private fun print(
-        logType: LogType = LogType.INFO,
-        tag: String = config.tag,
+        logType: LogType,
+        tag: String? = null,
         vararg content: Any,
     ) {
-        if (!config.enable) {
+
+        if (printerList.isEmpty() || content.isEmpty()) {
             return
         }
         //打印日志
-        config.printers.forEach {
+        printerList.forEach {
             it.print(logType, tag, *content)
         }
     }
@@ -148,14 +157,16 @@ object Logger {
     @JvmStatic
     fun json(
         json: String,
-        tag: String = config.tag,
+        tag: String? = null,
         type: LogType = LogType.INFO,
     ) {
         val tokener = JSONTokener(json)
 
         val obj = runCatching {
             tokener.nextValue()//解析字符串返回根对象
-        }.getOrDefault(" Parse json error")
+        }.onFailure {
+            it.printStackTrace()
+        }.getOrDefault("Parse json error")
 
         val message = when (obj) {
             is JSONObject -> obj.toString(2) //转成格式化的json

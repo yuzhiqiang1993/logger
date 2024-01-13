@@ -1,5 +1,6 @@
 package com.yzq.logger.demo.customer
 
+import com.yzq.logger.LoggerConfig
 import com.yzq.logger.formater.IFormatter
 
 
@@ -10,9 +11,8 @@ import com.yzq.logger.formater.IFormatter
 
 object CustomerFormater : IFormatter {
 
-    override fun formatToStr(tag: String, vararg content: Any): String {
 
-
+    override fun formatToStr(config: LoggerConfig, tag: String, vararg content: Any): String {
         return "CustomerFormater---》tag:$tag, content:${content.contentToString()}"
     }
 }

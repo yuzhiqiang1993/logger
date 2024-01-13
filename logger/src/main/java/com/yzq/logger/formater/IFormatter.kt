@@ -1,5 +1,7 @@
 package com.yzq.logger.formater
 
+import com.yzq.logger.LoggerConfig
+
 
 /**
  * @description: 格式化接口
@@ -7,5 +9,5 @@ package com.yzq.logger.formater
  */
 
 interface IFormatter {
-    fun formatToStr(tag: String, vararg content: Any): String
+    fun formatToStr(config: LoggerConfig, tag: String, vararg content: Any): String
 }
