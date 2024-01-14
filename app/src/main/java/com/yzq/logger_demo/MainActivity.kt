@@ -1,17 +1,19 @@
-package com.yzq.logger.demo
+package com.yzq.logger_demo
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.yzq.logger.LogType
 import com.yzq.logger.Logger
-import com.yzq.logger.demo.data.User
-import com.yzq.logger.demo.databinding.ActivityMainBinding
+import com.yzq.logger.common.LogType
+import com.yzq.logger_demo.data.User
+import com.yzq.logger_demo.databinding.ActivityMainBinding
 import org.json.JSONObject
 import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var viewbinding: ActivityMainBinding
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewbinding = ActivityMainBinding.inflate(layoutInflater)
@@ -31,6 +33,15 @@ class MainActivity : AppCompatActivity() {
         val user = User("yuzhiqiang", 18)
 
         Logger.i("user", user)
+
+        val userList: MutableList<User> = arrayListOf()
+        for (i in 0..4) {
+            userList.add(user)
+        }
+        val userListJson = MoshiUtils.toJson(userList, "  ")
+
+        Logger.i(userListJson)
+//        Log.i("userList", userListJson)
 
 
         /*打印json*/

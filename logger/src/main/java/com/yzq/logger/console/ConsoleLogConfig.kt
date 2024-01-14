@@ -1,34 +1,25 @@
-package com.yzq.logger
+package com.yzq.logger.console
+
+import com.yzq.logger.base.AbsLogConfig
 
 
 /**
- * @description: Logger 配置
+ * @description: 控制台打印器配置类
  * @author : yuzhiqiang
  */
 
-class LoggerConfig private constructor() {
-    //是否启用
-    var enable = false
+class ConsoleLogConfig private constructor() : AbsLogConfig() {
 
-    //默认tag
-    var tag = "Logger"
-
-    //是否显示堆栈信息
-    var showStackTrace = true
 
     //是否显示边框
     var showBorder = true
 
-    //是否显示线程信息
-    var showThreadInfo = true
-
-
-    //每行显示的字符数
+    //每行显示的字符数,最小500，最大4000
     var lineLength = 4000
 
 
     class Builder {
-        private val config = LoggerConfig()
+        private val config = ConsoleLogConfig()
 
         fun enable(enable: Boolean): Builder {
             config.enable = enable
@@ -39,6 +30,7 @@ class LoggerConfig private constructor() {
             config.tag = tag
             return this
         }
+
 
         fun showStackTrace(showStackTrace: Boolean): Builder {
             config.showStackTrace = showStackTrace
@@ -61,6 +53,11 @@ class LoggerConfig private constructor() {
             return this
         }
 
+
+        fun showTimestamp(showTimestamp: Boolean): Builder {
+            config.showTimestamp = showTimestamp
+            return this
+        }
 
         fun build() = config
     }

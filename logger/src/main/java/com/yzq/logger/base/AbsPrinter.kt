@@ -1,7 +1,6 @@
-package com.yzq.logger.printer
+package com.yzq.logger.base
 
-import com.yzq.logger.LogType
-import com.yzq.logger.LoggerConfig
+import com.yzq.logger.common.LogType
 
 
 /**
@@ -9,9 +8,8 @@ import com.yzq.logger.LoggerConfig
  * @author : yuzhiqiang
  */
 
-abstract class AbsPrinter {
+abstract class AbsPrinter(open val config: AbsLogConfig, val formatter: ILogFormatter) {
 
-    var loggerConfig: LoggerConfig = LoggerConfig.Builder().build()
 
     /**
      * 打印

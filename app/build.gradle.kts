@@ -3,10 +3,10 @@ plugins {
 }
 
 android {
-    namespace = "com.yzq.logger.demo"
+    namespace = "com.yzq.logger_demo"
 
     defaultConfig {
-        applicationId = "com.yzq.logger.demo"
+        applicationId = "com.yzq.logger_demo"
         versionCode = 1
         versionName = "1.0"
 

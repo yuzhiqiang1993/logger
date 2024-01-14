@@ -1,6 +1,7 @@
 package com.yzq.logger
 
-import com.yzq.logger.printer.AbsPrinter
+import com.yzq.logger.base.AbsPrinter
+import com.yzq.logger.common.LogType
 import org.json.JSONArray
 import org.json.JSONObject
 import org.json.JSONTokener
@@ -72,7 +73,7 @@ object Logger {
         tag: String,
         vararg content: Any,
     ) {
-        print(LogType.DEBUG, tag, content)
+        print(LogType.DEBUG, tag, *content)
     }
 
 
@@ -88,7 +89,7 @@ object Logger {
         tag: String,
         vararg content: Any,
     ) {
-        print(LogType.WARN, tag, content)
+        print(LogType.WARN, tag, *content)
     }
 
 

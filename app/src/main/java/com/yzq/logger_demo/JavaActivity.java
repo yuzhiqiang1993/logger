@@ -1,4 +1,4 @@
-package com.yzq.logger.demo;
+package com.yzq.logger_demo;
 
 import android.app.Activity;
 import android.content.Intent;
