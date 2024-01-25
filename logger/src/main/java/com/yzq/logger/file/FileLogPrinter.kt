@@ -60,11 +60,18 @@ class FileLogPrinter private constructor(override val config: FileLogConfig) :
                 LogItem(
                     tag ?: config.tag,
                     logType,
-                    System.currentTimeMillis(),
-                    currentThread().name,
-                    Throwable().firstStackTraceInfo(),
                     content = content
-                )
+                ).also {
+                    if (config.showTimestamp) {
+                        it.timeMillis = System.currentTimeMillis()
+                    }
+                    if (config.showThreadInfo) {
+                        it.threadName = currentThread().name
+                    }
+                    if (config.showStackTrace) {
+                        it.traceInfo = Throwable().firstStackTraceInfo()
+                    }
+                }
             )
         }
 

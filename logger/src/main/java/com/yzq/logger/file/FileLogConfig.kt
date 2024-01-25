@@ -71,6 +71,21 @@ class FileLogConfig : AbsLogConfig() {
             return this
         }
 
+        fun showThreadInfo(showThreadInfo: Boolean): Builder {
+            config.showThreadInfo = showThreadInfo
+            return this
+        }
+
+        fun showStackTrace(showStackTrace: Boolean): Builder {
+            config.showStackTrace = showStackTrace
+            return this
+        }
+
+        fun showTimestamp(showTimestamp: Boolean): Builder {
+            config.showTimestamp = showTimestamp
+            return this
+        }
+
         fun build() = config
     }
 

@@ -17,6 +17,7 @@ object Logger {
 
     private val printerList = Collections.synchronizedList(arrayListOf<AbsPrinter>())
 
+    @JvmStatic
     fun addPrinter(printer: AbsPrinter): Logger {
         if (printerList.contains(printer)) {
             return this
@@ -25,12 +26,14 @@ object Logger {
         return this
     }
 
+    @JvmStatic
     fun removePrinter(printer: AbsPrinter) {
         if (printerList.contains(printer)) {
             printerList.remove(printer)
         }
     }
 
+    @JvmStatic
     fun clearPrinter() {
         printerList.clear()
     }
