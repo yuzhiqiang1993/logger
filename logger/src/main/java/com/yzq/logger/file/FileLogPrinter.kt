@@ -2,11 +2,10 @@ package com.yzq.logger.file
 
 import com.yzq.application.AppManager
 import com.yzq.application.AppStateListener
+import com.yzq.coroutine.thread_pool.ThreadPoolManager
 import com.yzq.logger.common.LogType
 import com.yzq.logger.common.firstStackTraceInfo
 import com.yzq.logger.core.AbsPrinter
-import com.yzq.logger.core.ThreadPoolManager
-import com.yzq.logger.core.executeTask
 import com.yzq.logger.data.LogItem
 import java.lang.Thread.currentThread
 import java.util.concurrent.LinkedBlockingQueue
@@ -25,7 +24,7 @@ class FileLogPrinter private constructor(override val config: FileLogConfig) :
 
     //只有一个线程的线程池
     private val singleThreadPoolExecutor by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
-        ThreadPoolManager.instance.createThreadPool(1, 1, "FileLogPrinter")
+        ThreadPoolManager.instance.fixedThreadPoolExecutor(1)
     }
 
 
@@ -95,7 +94,7 @@ class FileLogPrinter private constructor(override val config: FileLogConfig) :
             return
         }
         //启动日志写入线程
-        singleThreadPoolExecutor.executeTask {
+        singleThreadPoolExecutor.execute {
             while (currentThread().isInterrupted.not()) {
                 runCatching {
                     logBlockingQueue?.take()?.let {

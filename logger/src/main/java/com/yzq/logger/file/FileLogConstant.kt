@@ -1,14 +1,12 @@
 package com.yzq.logger.file
 
-import com.yzq.logger.common.LogType
-
 
 /**
  * @description: 文件日志常量类，用于存放文件日志相关的常量信息
  * @author : yuzhiqiang
  */
 
-object FileLogConstant {
+internal object FileLogConstant {
     //日志文件的存储目录
     const val dirName: String = ".log"
 
@@ -24,8 +22,6 @@ object FileLogConstant {
     //日志文件名字的前缀
     const val filePrefix: String = "log"
 
-    //最低日志级别
-    val minLevel: LogType = LogType.VERBOSE
 
     //日志阻塞队列的最大容量
     const val logQueueCapacity: Int = 1000

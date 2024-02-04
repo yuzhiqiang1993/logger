@@ -18,6 +18,11 @@ class ConsoleLogConfig : AbsLogConfig() {
     var lineLength = 4000
 
 
+    fun enable(enable: Boolean): ConsoleLogConfig {
+        this.enable = enable
+        return this
+    }
+
     fun showBorder(showBorder: Boolean): ConsoleLogConfig {
         this.showBorder = showBorder
         return this

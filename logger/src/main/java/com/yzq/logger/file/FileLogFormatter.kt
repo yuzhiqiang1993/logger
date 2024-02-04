@@ -13,7 +13,6 @@ import com.yzq.logger.data.LogItem
 
 internal class FileLogFormatter private constructor() : ILogFormatter {
 
-
     companion object {
         val instance by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
             FileLogFormatter()

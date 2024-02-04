@@ -11,5 +11,5 @@ dependencies {
     implementation(libs.kotlin.stdlib)
     implementation(libs.androidx.appcompat)
     api(libs.xeonyu.application)
-    api(libs.xeonyu.coroutine)
+    implementation(libs.xeonyu.coroutine)
 }

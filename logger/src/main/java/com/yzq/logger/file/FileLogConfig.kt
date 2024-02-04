@@ -11,6 +11,7 @@ import com.yzq.logger.core.AbsLogConfig
 
 class FileLogConfig : AbsLogConfig() {
 
+
     //日志文件的存储目录
     var dirName: String = FileLogConstant.dirName
 

@@ -5,8 +5,8 @@ import com.yzq.application.AppStateListener
 import com.yzq.application.AppStorage
 import com.yzq.coroutine.interval.interval
 import com.yzq.coroutine.safety_coroutine.getThreadInfo
-import com.yzq.logger.core.ThreadPoolManager
-import com.yzq.logger.core.invokeAllTask
+import com.yzq.coroutine.thread_pool.ThreadPoolManager
+import com.yzq.logger.core.println
 import com.yzq.logger.data.LogItem
 import java.io.BufferedWriter
 import java.io.File
@@ -34,8 +34,6 @@ internal class FileLogWriter private constructor(
     //日志文件的存储目录,默认是/data/user/0/com.xxx.xxxx/files/.log/
     private var logFileDir = ""
 
-//    //存放日志的缓冲map,key是要写入的文件，value是日志列表
-//    private val logBufferMap = ConcurrentHashMap<File, MutableList<LogItem>>()
 
     //用于存放日志数据的线程安全的list
     private val logBufferList = Collections.synchronizedList(mutableListOf<LogItem>())
@@ -45,7 +43,6 @@ internal class FileLogWriter private constructor(
 
     //用于执行定时任务的定时器
     private val interval = interval(config.writeLogInterval, initialDelay = config.writeLogInterval)
-
 
     //存放日志文件的列表
     private var existLogFileList = listLogDirFiles()
@@ -97,12 +94,12 @@ internal class FileLogWriter private constructor(
             logFileDir.mkdirs()
         }
 
-        println("日志目录:$logFileDir,准备完毕")
+//        println("日志目录:$logFileDir,准备完毕")
         clearExpiredLogFiles()
 
         //启动一个定时任务，用于定期写入日志,避免出现日志条数不满足条件，导致日志不写入的情况
         interval.subscribe {
-            println("定时任务开始执行:${config.writeLogInterval},次数:${it}")
+            "定时任务开始执行:${config.writeLogInterval},次数:${it}".println()
             flushLog(true)
         }.start()
 
@@ -116,10 +113,10 @@ internal class FileLogWriter private constructor(
     }
 
     private fun flushLog(forceFlush: Boolean = false) {
-        println("flushLog forceFlush:$forceFlush,threadInfo:${getThreadInfo()}")
+        "flushLog forceFlush:$forceFlush,threadInfo:${getThreadInfo()}".println()
         if (logBufferList.size <= 0) return
         if (logBufferList.size >= config.maxCacheSize || forceFlush) {
-            println("满足写入条件，开始写入日志")
+            "满足写入条件，开始写入日志".println()
             val logBufferMap = logBufferList.groupBy {
                 getOperateFile(it)
             }.filter {
@@ -133,18 +130,15 @@ internal class FileLogWriter private constructor(
                 }
             }
 
-            println("执行写入任务，任务数量:${writeLogTaskList.size}")
-            writeLogExecutor.invokeAllTask(writeLogTaskList)
-            println("写入任务执行完毕")
+            "执行写入任务，任务数量:${writeLogTaskList.size}".println()
+            writeLogExecutor.invokeAll(writeLogTaskList)
+            "写入任务执行完毕".println()
 
             writeLogTaskList.clear()
             logBufferList.clear()
             lastWriteTime = System.currentTimeMillis()
 
-        } else {
-            println("不满足写入条件")
         }
-
 
     }
 
@@ -155,7 +149,7 @@ internal class FileLogWriter private constructor(
                     if (!file.exists()) {
                         file.createNewFile()
                     }
-                    println("写文件的线程信息：${getThreadInfo()}")
+                    "写文件的线程信息：${getThreadInfo()}".println()
                     val sb = StringBuilder()
                     logList.forEach { logItem ->
                         sb.append(
@@ -167,7 +161,7 @@ internal class FileLogWriter private constructor(
                         bw.append(sb.toString())
                         bw.flush()
                     }
-                    println("${file.name} 日志写入完成，条数：${logList.size}")
+                    "${file.name} 日志写入完成，条数：${logList.size}".println()
                     sb.clear()
                 }
                 true
@@ -180,18 +174,33 @@ internal class FileLogWriter private constructor(
      */
 
     private fun clearExpiredLogFiles() {
-        println("clearExpiredLogFiles storageDuration:${config.storageDuration}")
+        "clearExpiredLogFiles storageDuration:${config.storageDuration}".println()
 
         if (config.storageDuration <= 0) {
             return
         }
+        existLogFileList = listLogDirFiles()
+
         //计算过期时间点
         val expiredTime = System.currentTimeMillis() - config.storageDuration * 60 * 60 * 1000
 
+        "过期时间点:${
+            SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(
+                expiredTime
+            )
+        }".println()
+
         existLogFileList.filter {
+            "${it.name} 最后修改时间:${
+                SimpleDateFormat(
+                    "yyyy-MM-dd HH:mm:ss",
+                    Locale.getDefault()
+                ).format(it.lastModified())
+            }".println()
+
             it.isFile && it.lastModified() < expiredTime
         }.forEach {
-            println("删除过期日志文件:${it.name}")
+            "删除过期日志文件:${it.name}".println()
             synchronized(it) {
                 it.delete()
             }
@@ -245,7 +254,6 @@ internal class FileLogWriter private constructor(
 
         //如果不存在以当前时间点开头的文件，则创建一个
         if (existTimeFileList.isEmpty()) {
-            println("不存在当前时间点的文件，新建")
             val newFile = File(logFileDir, "${filePrefix}-${fileIndex}.txt").also {
                 it.createNewFile()
             }
@@ -268,7 +276,6 @@ internal class FileLogWriter private constructor(
         }
 
         //创建一个新的文件
-        println("创建新文件")
         fileIndex = existTimeFileList.size + 1
         val newFile = File(logFileDir, "${filePrefix}-${fileIndex}.txt").also {
             it.createNewFile()
@@ -277,6 +284,7 @@ internal class FileLogWriter private constructor(
 
         return@runCatching newFile
     }.getOrDefault(null)
+
 
     private fun updateExistLogFileList() {
         existLogFileList = listLogDirFiles()
