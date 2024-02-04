@@ -1,4 +1,4 @@
-package com.yzq.logger.base
+package com.yzq.logger.core
 
 import android.util.Log
 import com.yzq.logger.common.LogType
@@ -25,7 +25,7 @@ interface ILogFormatter {
      * @param content Array<out Any>
      * @return String
      */
-    fun parseContent(vararg content: Any): String = runCatching {
+    fun parseContent(vararg content: Any?): String = runCatching {
         content.joinToString(", ") {
             when (it) {
                 is String -> it
@@ -33,11 +33,11 @@ interface ILogFormatter {
                 is Map<*, *> -> it.toString()
                 is Collection<*> -> it.toString()
                 is Array<*> -> it.contentToString()
-                else -> it.toString()
+                else -> it?.toString() ?: "null"
             }
         }
     }.onFailure {
         it.printStackTrace()
-    }.getOrDefault("内容解析异常")
+    }.getOrDefault("Logger:内容解析异常，无法打印实际内容")
 }
 

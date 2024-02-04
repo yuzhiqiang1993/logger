@@ -1,6 +1,6 @@
 package com.yzq.logger.console
 
-import com.yzq.logger.base.AbsLogConfig
+import com.yzq.logger.core.AbsLogConfig
 
 
 /**
@@ -8,7 +8,7 @@ import com.yzq.logger.base.AbsLogConfig
  * @author : yuzhiqiang
  */
 
-class ConsoleLogConfig private constructor() : AbsLogConfig() {
+class ConsoleLogConfig : AbsLogConfig() {
 
 
     //是否显示边框
@@ -18,48 +18,29 @@ class ConsoleLogConfig private constructor() : AbsLogConfig() {
     var lineLength = 4000
 
 
-    class Builder {
-        private val config = ConsoleLogConfig()
+    fun showBorder(showBorder: Boolean): ConsoleLogConfig {
+        this.showBorder = showBorder
+        return this
+    }
 
-        fun enable(enable: Boolean): Builder {
-            config.enable = enable
-            return this
-        }
+    fun lineLength(lineLength: Int): ConsoleLogConfig {
+        this.lineLength = lineLength
+        return this
+    }
 
-        fun tag(tag: String): Builder {
-            config.tag = tag
-            return this
-        }
+    fun showStackTrace(showStackTrace: Boolean): ConsoleLogConfig {
+        this.showStackTrace = showStackTrace
+        return this
+    }
 
+    fun showThreadInfo(showThreadInfo: Boolean): ConsoleLogConfig {
+        this.showThreadInfo = showThreadInfo
+        return this
+    }
 
-        fun showStackTrace(showStackTrace: Boolean): Builder {
-            config.showStackTrace = showStackTrace
-            return this
-        }
-
-        fun showBorder(showBorder: Boolean): Builder {
-            config.showBorder = showBorder
-            return this
-        }
-
-
-        fun showThreadInfo(showThreadInfo: Boolean): Builder {
-            config.showThreadInfo = showThreadInfo
-            return this
-        }
-
-        fun lineLength(lineLength: Int): Builder {
-            config.lineLength = lineLength
-            return this
-        }
-
-
-        fun showTimestamp(showTimestamp: Boolean): Builder {
-            config.showTimestamp = showTimestamp
-            return this
-        }
-
-        fun build() = config
+    fun showTimestamp(showTimestamp: Boolean): ConsoleLogConfig {
+        this.showTimestamp = showTimestamp
+        return this
     }
 
 

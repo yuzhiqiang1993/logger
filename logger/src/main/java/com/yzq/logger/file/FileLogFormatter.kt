@@ -1,8 +1,8 @@
 package com.yzq.logger.file
 
-import com.yzq.logger.base.ILogFormatter
 import com.yzq.logger.common.formatLogContent
 import com.yzq.logger.common.formatLogHeader
+import com.yzq.logger.core.ILogFormatter
 import com.yzq.logger.data.LogItem
 
 

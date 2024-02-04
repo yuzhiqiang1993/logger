@@ -1,8 +1,8 @@
 package com.yzq.logger.console
 
-import com.yzq.logger.base.AbsPrinter
 import com.yzq.logger.common.LogType
 import com.yzq.logger.common.doLog
+import com.yzq.logger.core.AbsPrinter
 import kotlin.math.min
 
 
@@ -13,13 +13,14 @@ import kotlin.math.min
 class ConsoleLogPrinter private constructor(
     private val consoleLogConfig: ConsoleLogConfig
 ) :
-    AbsPrinter(consoleLogConfig, ConsoleLogFormatter.instance.apply { config = consoleLogConfig }) {
+    AbsPrinter(consoleLogConfig, ConsoleLogFormatter.getInstance(consoleLogConfig)) {
 
 
     companion object {
+        @Volatile
         private var instance: ConsoleLogPrinter? = null
         fun getInstance(
-            logConfig: ConsoleLogConfig = ConsoleLogConfig.Builder().build()
+            logConfig: ConsoleLogConfig = ConsoleLogConfig()
         ): ConsoleLogPrinter {
             if (instance == null) {
                 synchronized(ConsoleLogPrinter::class.java) {

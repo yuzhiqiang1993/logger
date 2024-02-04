@@ -1,4 +1,4 @@
-package com.yzq.logger.base
+package com.yzq.logger.core
 
 import com.yzq.logger.common.LogType
 

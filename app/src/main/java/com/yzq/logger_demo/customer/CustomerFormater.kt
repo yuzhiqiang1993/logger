@@ -1,7 +1,7 @@
 package com.yzq.logger_demo.customer
 
-import com.yzq.logger.base.ILogFormatter
 import com.yzq.logger.common.LogType
+import com.yzq.logger.core.ILogFormatter
 
 
 /**

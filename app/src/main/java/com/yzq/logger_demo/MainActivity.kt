@@ -55,5 +55,20 @@ class MainActivity : AppCompatActivity() {
             startActivity(JavaActivity.createIntent(this))
         }
 
+        viewbinding.btnPrint.setOnClickListener {
+            Logger.i("点击了打印按钮")
+
+            for (i in 0..100) {
+                Logger.i("循环打印$i")
+            }
+
+        }
+
+
+        //循环打印1000次
+//        for (i in 0..1000) {
+//            Logger.i("循环打印$i")
+//        }
+
     }
 }

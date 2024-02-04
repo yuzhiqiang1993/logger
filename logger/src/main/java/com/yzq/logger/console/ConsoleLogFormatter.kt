@@ -1,23 +1,27 @@
 package com.yzq.logger.console
 
-import com.yzq.logger.base.ILogFormatter
 import com.yzq.logger.common.LogType
 import com.yzq.logger.common.firstStackTraceInfo
 import com.yzq.logger.common.formatLogContent
 import com.yzq.logger.common.formatLogHeader
+import com.yzq.logger.core.ILogFormatter
 
 
 /**
  * @description: 默认的内容格式化器
  * @author : yuzhiqiang
  */
-internal class ConsoleLogFormatter private constructor() : ILogFormatter {
+internal class ConsoleLogFormatter private constructor(private val config: ConsoleLogConfig) :
+    ILogFormatter {
 
-    var config: ConsoleLogConfig? = null
 
     companion object {
-        val instance by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
-            ConsoleLogFormatter()
+        @Volatile
+        private var instance: ConsoleLogFormatter? = null
+        fun getInstance(config: ConsoleLogConfig): ConsoleLogFormatter {
+            return instance ?: synchronized(this) {
+                instance ?: ConsoleLogFormatter(config).also { instance = it }
+            }
         }
     }
 
@@ -33,11 +37,11 @@ internal class ConsoleLogFormatter private constructor() : ILogFormatter {
         val contentStr = parseContent(*content)
 
         val threadName =
-            config?.showThreadInfo.takeIf { it == true }?.let { Thread.currentThread().name }
+            config.showThreadInfo.takeIf { it == true }?.let { Thread.currentThread().name }
         val traceInfo =
-            config?.showStackTrace.takeIf { it == true }?.let { Throwable().firstStackTraceInfo() }
+            config.showStackTrace.takeIf { it == true }?.let { Throwable().firstStackTraceInfo() }
         val timeMillis =
-            config?.showTimestamp.takeIf { it == true }?.let { System.currentTimeMillis() }
+            config.showTimestamp.takeIf { it == true }?.let { System.currentTimeMillis() }
 
         return buildLogStr(tag, contentStr, threadName, timeMillis, traceInfo)
     }
@@ -59,7 +63,7 @@ internal class ConsoleLogFormatter private constructor() : ILogFormatter {
         traceInfo: String?,
     ): String {
         val sb = StringBuilder()
-        if (config?.showBorder != false) {
+        if (config.showBorder != false) {
             sb.appendLine("┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────")
             sb.appendLine(
                 "│ ${

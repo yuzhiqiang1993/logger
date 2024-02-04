@@ -1,7 +1,7 @@
 package com.yzq.logger
 
-import com.yzq.logger.base.AbsPrinter
 import com.yzq.logger.common.LogType
+import com.yzq.logger.core.AbsPrinter
 import org.json.JSONArray
 import org.json.JSONObject
 import org.json.JSONTokener
@@ -170,7 +170,7 @@ object Logger {
             tokener.nextValue()//解析字符串返回根对象
         }.onFailure {
             it.printStackTrace()
-        }.getOrDefault("Parse json error")
+        }.getOrDefault("Logger：Json解析异常，无法打印出实际内容")
 
         val message = when (obj) {
             is JSONObject -> obj.toString(2) //转成格式化的json

@@ -1,26 +1,24 @@
 package com.yzq.logger.file
 
-import com.yzq.logger.base.AbsPrinter
 import com.yzq.logger.common.LogType
 import com.yzq.logger.common.firstStackTraceInfo
+import com.yzq.logger.core.AbsPrinter
+import com.yzq.logger.core.ThreadPoolManager
 import com.yzq.logger.data.LogItem
 import java.lang.Thread.currentThread
-import java.util.concurrent.Executors
 import java.util.concurrent.LinkedBlockingQueue
 
 
 /**
- * @description: 文件打印器，用于将日志打印到文件中
+ * @description: 文件日志打印器
  * @author : yuzhiqiang
  */
 class FileLogPrinter private constructor(override val config: FileLogConfig) :
     AbsPrinter(config, FileLogFormatter.instance) {
 
-    //存放日志的阻塞队列
-    private val logBlockingQueue = LinkedBlockingQueue<LogItem>(1000)
 
-    //日志写入线程
-    private val executorService = Executors.newSingleThreadExecutor()
+    //存放日志的阻塞队列
+    private var logBlockingQueue: LinkedBlockingQueue<LogItem>? = null
 
 
     companion object {
@@ -28,16 +26,29 @@ class FileLogPrinter private constructor(override val config: FileLogConfig) :
         @Volatile
         private var instance: FileLogPrinter? = null
 
-        //日志文件管理器
-        private var fileLogManager: FileLogManager? = null
+        //文件日志写入器
+        @Volatile
+        private var fileLogWriter: FileLogWriter? = null
 
         fun getInstance(config: FileLogConfig = FileLogConfig()): FileLogPrinter {
             return instance ?: synchronized(this) {
                 instance ?: FileLogPrinter(config).also {
+                    if (config.logQueueCapacity <= FileLogConstant.logQueueCapacity) {
+                        config.logQueueCapacity = FileLogConstant.logQueueCapacity
+                    }
+                    //初始化阻塞队列
+                    it.logBlockingQueue = LinkedBlockingQueue(config.logQueueCapacity)
+
+                    //写入日志的间隔时间不能小于默认值，但是也不能大于
+                    if (config.writeLogInterval < FileLogConstant.writeLogInterval) {
+                        config.writeLogInterval = FileLogConstant.writeLogInterval
+                    }
                     instance = it
-                    fileLogManager = FileLogManager.getInstance(config, FileLogFormatter.instance)
-                    fileLogManager?.clearExpiredLogFiles()
-                    it.startWriteLog()
+                    fileLogWriter = FileLogWriter.getInstance(config)
+
+                    //启动日志写入线程
+                    it.startPrintService()
+
                 }
             }
 
@@ -46,53 +57,44 @@ class FileLogPrinter private constructor(override val config: FileLogConfig) :
 
 
     override fun print(logType: LogType, tag: String?, vararg content: Any) {
-        if (!config.enable) {
+        if (!config.enable || logBlockingQueue == null) {
             return
         }
-//        if (config.logFilePath.isEmpty() || config.logFilePath.isNotDir()) {
-//            println("日志文件路径为空或者不是一个文件夹")
-//            return
-//        }
 
         if (logType.level >= config.minLevel.level) {
             //将日志加入到阻塞队列中，等待写入，如果队列满了，则丢弃，不会阻塞，不会抛出异常
-            logBlockingQueue.offer(
-                LogItem(
-                    tag ?: config.tag,
-                    logType,
-                    content = content
-                ).also {
-                    if (config.showTimestamp) {
-                        it.timeMillis = System.currentTimeMillis()
-                    }
-                    if (config.showThreadInfo) {
-                        it.threadName = currentThread().name
-                    }
-                    if (config.showStackTrace) {
-                        it.traceInfo = Throwable().firstStackTraceInfo()
-                    }
+            logBlockingQueue?.offer(LogItem(
+                tag ?: config.tag, logType, content = content
+            ).also {
+                if (config.showTimestamp) {
+                    it.timeMillis = System.currentTimeMillis()
                 }
-            )
+                if (config.showThreadInfo) {
+                    it.threadName = currentThread().name
+                }
+                if (config.showStackTrace) {
+                    it.traceInfo = Throwable().firstStackTraceInfo()
+                }
+            })
         }
 
 
     }
 
-    private fun startWriteLog() {
+
+    private fun startPrintService() {
         if (!config.enable) {
             return
         }
-//        if (config.logFilePath.isEmpty() || config.logFilePath.isNotDir()) {
-//            println("日志文件路径为空或者不是一个文件夹")
-//            return
-//        }
         //启动日志写入线程
-        executorService.submit {
+        ThreadPoolManager.instance.singleThreadPoolExecutor.execute {
             while (currentThread().isInterrupted.not()) {
                 runCatching {
-                    val log = logBlockingQueue.take()
-                    //写入日志到文件中
-                    fileLogManager?.writeLogToFile(log)
+                    logBlockingQueue?.take()?.let {
+                        println("阻塞队列中拿到数据了，去写入")
+                        //写入日志到文件中
+                        fileLogWriter?.writeLog(it)
+                    }
                 }.onFailure {
                     it.printStackTrace()
                 }
