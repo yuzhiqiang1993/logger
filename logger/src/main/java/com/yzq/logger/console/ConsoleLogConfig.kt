@@ -38,10 +38,5 @@ class ConsoleLogConfig : AbsLogConfig() {
         return this
     }
 
-    fun showTimestamp(showTimestamp: Boolean): ConsoleLogConfig {
-        this.showTimestamp = showTimestamp
-        return this
-    }
-
 
 }

@@ -1,9 +1,12 @@
 package com.yzq.logger.file
 
+import com.yzq.application.AppManager
+import com.yzq.application.AppStateListener
 import com.yzq.logger.common.LogType
 import com.yzq.logger.common.firstStackTraceInfo
 import com.yzq.logger.core.AbsPrinter
 import com.yzq.logger.core.ThreadPoolManager
+import com.yzq.logger.core.executeTask
 import com.yzq.logger.data.LogItem
 import java.lang.Thread.currentThread
 import java.util.concurrent.LinkedBlockingQueue
@@ -14,11 +17,21 @@ import java.util.concurrent.LinkedBlockingQueue
  * @author : yuzhiqiang
  */
 class FileLogPrinter private constructor(override val config: FileLogConfig) :
-    AbsPrinter(config, FileLogFormatter.instance) {
+    AbsPrinter(config, FileLogFormatter.instance), AppStateListener {
 
 
     //存放日志的阻塞队列
     private var logBlockingQueue: LinkedBlockingQueue<LogItem>? = null
+
+    //只有一个线程的线程池
+    private val singleThreadPoolExecutor by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
+        ThreadPoolManager.instance.createThreadPool(1, 1, "FileLogPrinter")
+    }
+
+
+    init {
+        AppManager.addAppStateListener(this)
+    }
 
 
     companion object {
@@ -64,11 +77,8 @@ class FileLogPrinter private constructor(override val config: FileLogConfig) :
         if (logType.level >= config.minLevel.level) {
             //将日志加入到阻塞队列中，等待写入，如果队列满了，则丢弃，不会阻塞，不会抛出异常
             logBlockingQueue?.offer(LogItem(
-                tag ?: config.tag, logType, content = content
+                tag ?: config.tag, logType, System.currentTimeMillis(), content = content,
             ).also {
-                if (config.showTimestamp) {
-                    it.timeMillis = System.currentTimeMillis()
-                }
                 if (config.showThreadInfo) {
                     it.threadName = currentThread().name
                 }
@@ -77,8 +87,6 @@ class FileLogPrinter private constructor(override val config: FileLogConfig) :
                 }
             })
         }
-
-
     }
 
 
@@ -87,11 +95,10 @@ class FileLogPrinter private constructor(override val config: FileLogConfig) :
             return
         }
         //启动日志写入线程
-        ThreadPoolManager.instance.singleThreadPoolExecutor.execute {
+        singleThreadPoolExecutor.executeTask {
             while (currentThread().isInterrupted.not()) {
                 runCatching {
                     logBlockingQueue?.take()?.let {
-                        println("阻塞队列中拿到数据了，去写入")
                         //写入日志到文件中
                         fileLogWriter?.writeLog(it)
                     }
@@ -99,8 +106,14 @@ class FileLogPrinter private constructor(override val config: FileLogConfig) :
                     it.printStackTrace()
                 }
             }
-
         }
+    }
+
+
+    override fun onAppExit() {
+        singleThreadPoolExecutor.shutdown()
+        AppManager.removeAppStateListener(this)
+
     }
 
 

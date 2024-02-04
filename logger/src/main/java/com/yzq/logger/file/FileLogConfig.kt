@@ -17,7 +17,7 @@ class FileLogConfig : AbsLogConfig() {
     //日志文件的存储时长，单位小时，超过这个时间的日志文件将被删除,小于等于0表示不清除
     var storageDuration: Int = FileLogConstant.storageDuration
 
-    //日志文件的最大大小，单位字节，超过这个大小的后会轮转日志文件。默认10M
+    //日志文件的最大大小，单位字节，超过这个大小的后会轮转日志文件
     var maxFileSize: Int = FileLogConstant.maxFileSize
 
 
@@ -96,11 +96,6 @@ class FileLogConfig : AbsLogConfig() {
 
     fun showThreadInfo(showThreadInfo: Boolean): FileLogConfig {
         this.showThreadInfo = showThreadInfo
-        return this
-    }
-
-    fun showTimestamp(showTimestamp: Boolean): FileLogConfig {
-        this.showTimestamp = showTimestamp
         return this
     }
 

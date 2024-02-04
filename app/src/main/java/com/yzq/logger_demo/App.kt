@@ -18,6 +18,9 @@ class App : Application() {
             FileLogConfig()
                 .enable(true)
                 .storageDuration(1)
+                .showStackTrace(false)
+                .writeLogInterval(60)
+                .maxFileSize(1024 * 1024 * 2)//2M
 //                        .showTimestamp(false)
 //                        .showStackTrace(false)
         )

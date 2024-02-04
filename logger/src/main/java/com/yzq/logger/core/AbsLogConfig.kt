@@ -20,8 +20,5 @@ abstract class AbsLogConfig {
     //是否显示线程信息
     var showThreadInfo = true
 
-    //是否显示时间戳 格式为 yyyy-MM-dd HH:mm:ss:SSS
-    var showTimestamp = true
-
 
 }

@@ -44,7 +44,7 @@ class ThreadPoolManager private constructor() {
     }
 
     //io 密集型的任务不会占用太多cpu时间片 承接任务可多一些 不做并发限制
-    private val ioThreadPoolExecutor by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
+    val ioThreadPoolExecutor by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
         createThreadPool(
             corePoolSize,
             maxPoolSize * 2,
@@ -98,62 +98,6 @@ class ThreadPoolManager private constructor() {
         private val threadId = AtomicInteger(0)
     }
 
-    /**
-     * 没有返回值,有异常会直接抛出,由于内部做了异常处理,所以不会导致崩溃
-     * @receiver ExecutorService
-     * @param task () -> Unit
-     */
-    fun ExecutorService.executeTask(task: () -> Unit) {
-        if (!this.isShutdown) {
-            execute(task)
-        }
-    }
-
-
-    /**
-     * 提交一个任务，返回值为Future,适用于需要拿到返回值的场景，如果执行过程中有异常，会在future.get()时抛出，会导致崩溃
-     * @param V
-     * @param task
-     * @receiver
-     * @return
-     */
-    fun <V> ExecutorService.submitTask(task: () -> V): Future<V>? {
-        if (!this.isShutdown) {
-            return this.submit(task)
-        }
-        return null
-    }
-
-
-    /**
-     * 执行多个任务，并返回 Future 列表，内部的任务是并行执行的，所有任务执行完毕后统一返回结果
-     * 如果其中某个task出现异常，不会影响其它task执行，会在future.get()时抛出
-     *
-     * @param V
-     * @param tasks
-     * @return
-     */
-    fun <V> ExecutorService.invokeAllTask(tasks: Collection<Callable<V>>): List<Future<V>> {
-        return if (!this.isShutdown) {
-            invokeAll(tasks)
-        } else emptyList()
-    }
-
-
-    /**
-     * 提交多个任务，并返回 Future 列表，内部的任务是并行执行的
-     * 跟 invokeAllIoTask 的区别是，在遍历List<Future<V>>时，是按照遍历顺序进行阻塞的，也就是说，如果第一个任务执行时间很长，那么后面的任务即使执行完毕，也会阻塞在future.get()处
-     * 如果其中某个task出现异常，不会影响其它task执行，会在future.get()时抛出
-     *
-     * @param V
-     * @param tasks
-     * @return
-     */
-    fun <V> ExecutorService.submitTasks(tasks: Collection<Callable<V>>): List<Future<V>> {
-        return if (!this.isShutdown) {
-            tasks.map { this.submit(it) }
-        } else emptyList()
-    }
 
 //
 //    /**
@@ -183,6 +127,64 @@ class ThreadPoolManager private constructor() {
 
     }
 
+}
+
+
+/**
+ * 没有返回值,有异常会直接抛出,由于内部做了异常处理,所以不会导致崩溃
+ * @receiver ExecutorService
+ * @param task () -> Unit
+ */
+fun ExecutorService.executeTask(task: () -> Unit) {
+    if (!this.isShutdown) {
+        execute(task)
+    }
+}
+
+
+/**
+ * 提交一个任务，返回值为Future,适用于需要拿到返回值的场景，如果执行过程中有异常，会在future.get()时抛出，会导致崩溃
+ * @param V
+ * @param task
+ * @receiver
+ * @return
+ */
+fun <V> ExecutorService.submitTask(task: () -> V): Future<V>? {
+    if (!this.isShutdown) {
+        return this.submit(task)
+    }
+    return null
+}
+
+
+/**
+ * 执行多个任务，并返回 Future 列表，内部的任务是并行执行的，所有任务执行完毕后统一返回结果
+ * 如果其中某个task出现异常，不会影响其它task执行，会在future.get()时抛出
+ *
+ * @param V
+ * @param tasks
+ * @return
+ */
+fun <V> ExecutorService.invokeAllTask(tasks: Collection<Callable<V>>): List<Future<V>> {
+    return if (!this.isShutdown) {
+        invokeAll(tasks)
+    } else emptyList()
+}
+
+
+/**
+ * 提交多个任务，并返回 Future 列表，内部的任务是并行执行的
+ * 跟 invokeAllIoTask 的区别是，在遍历List<Future<V>>时，是按照遍历顺序进行阻塞的，也就是说，如果第一个任务执行时间很长，那么后面的任务即使执行完毕，也会阻塞在future.get()处
+ * 如果其中某个task出现异常，不会影响其它task执行，会在future.get()时抛出
+ *
+ * @param V
+ * @param tasks
+ * @return
+ */
+fun <V> ExecutorService.submitTasks(tasks: Collection<Callable<V>>): List<Future<V>> {
+    return if (!this.isShutdown) {
+        tasks.map { this.submit(it) }
+    } else emptyList()
 }
 
 

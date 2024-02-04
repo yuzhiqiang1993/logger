@@ -37,13 +37,12 @@ internal class ConsoleLogFormatter private constructor(private val config: Conso
         val contentStr = parseContent(*content)
 
         val threadName =
-            config.showThreadInfo.takeIf { it == true }?.let { Thread.currentThread().name }
+            config.showThreadInfo.takeIf { it }?.let { Thread.currentThread().name }
         val traceInfo =
-            config.showStackTrace.takeIf { it == true }?.let { Throwable().firstStackTraceInfo() }
-        val timeMillis =
-            config.showTimestamp.takeIf { it == true }?.let { System.currentTimeMillis() }
+            config.showStackTrace.takeIf { it }?.let { Throwable().firstStackTraceInfo() }
 
-        return buildLogStr(tag, contentStr, threadName, timeMillis, traceInfo)
+
+        return buildLogStr(tag, contentStr, threadName, System.currentTimeMillis(), traceInfo)
     }
 
 
