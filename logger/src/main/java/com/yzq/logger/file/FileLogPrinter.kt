@@ -24,7 +24,7 @@ class FileLogPrinter private constructor(override val config: FileLogConfig) :
 
     //只有一个线程的线程池
     private val singleThreadPoolExecutor by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
-        ThreadPoolManager.instance.fixedThreadPoolExecutor(1)
+        ThreadPoolManager.instance.newFixedThreadPoolExecutor(1)
     }
 
 
@@ -93,26 +93,19 @@ class FileLogPrinter private constructor(override val config: FileLogConfig) :
         if (!config.enable) {
             return
         }
-        //启动日志写入线程
         singleThreadPoolExecutor.execute {
             while (currentThread().isInterrupted.not()) {
-                runCatching {
-                    logBlockingQueue?.take()?.let {
-                        //写入日志到文件中
-                        fileLogWriter?.writeLog(it)
-                    }
-                }.onFailure {
-                    it.printStackTrace()
+                logBlockingQueue?.take()?.let {
+                    fileLogWriter?.addLog(it)
                 }
             }
         }
+
     }
 
 
     override fun onAppExit() {
-        singleThreadPoolExecutor.shutdown()
         AppManager.removeAppStateListener(this)
-
     }
 
 

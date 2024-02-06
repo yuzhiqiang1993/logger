@@ -4,7 +4,6 @@ import com.yzq.application.AppManager
 import com.yzq.application.AppStateListener
 import com.yzq.application.AppStorage
 import com.yzq.coroutine.interval.interval
-import com.yzq.coroutine.safety_coroutine.getThreadInfo
 import com.yzq.coroutine.thread_pool.ThreadPoolManager
 import com.yzq.logger.core.println
 import com.yzq.logger.data.LogItem
@@ -12,9 +11,11 @@ import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
 import java.text.SimpleDateFormat
-import java.util.Collections
 import java.util.Locale
 import java.util.concurrent.Callable
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.locks.ReentrantLock
 
 
 /**
@@ -26,7 +27,6 @@ internal class FileLogWriter private constructor(
     private val config: FileLogConfig
 ) : AppStateListener {
 
-
     init {
         AppManager.addAppStateListener(this)
     }
@@ -35,8 +35,9 @@ internal class FileLogWriter private constructor(
     private var logFileDir = ""
 
 
-    //用于存放日志数据的线程安全的list
-    private val logBufferList = Collections.synchronizedList(mutableListOf<LogItem>())
+    //用于存放阻塞队列过来的日志
+    private val logBufferList = mutableListOf<LogItem>()
+
 
     //最后一次写入的时间
     private var lastWriteTime = System.currentTimeMillis()
@@ -47,12 +48,15 @@ internal class FileLogWriter private constructor(
     //存放日志文件的列表
     private var existLogFileList = listLogDirFiles()
 
-    //执行写操作的线程池
-    private val writeLogExecutor = ThreadPoolManager.instance.ioThreadPoolExecutor
+    //日志数据的锁
+    private var logDataLock = ReentrantLock(true)
 
+    //写日志的锁
+    private var writeLogLock = ReentrantLock(true)
 
-    //执行写如操作的taskList
-    private val writeLogTaskList = mutableListOf<Callable<Boolean>>()
+    //更新文件列表的锁
+    private val updateFileLock = ReentrantLock(true)
+
 
     companion object {
 
@@ -100,73 +104,116 @@ internal class FileLogWriter private constructor(
         //启动一个定时任务，用于定期写入日志,避免出现日志条数不满足条件，导致日志不写入的情况
         interval.subscribe {
             "定时任务开始执行:${config.writeLogInterval},次数:${it}".println()
-            flushLog(true)
+            writeLog(true)
         }.start()
 
     }
 
+    /**
+     * 需要保证添加log的原子性
+     * @param log LogItem?
+     * @param forceFlush Boolean
+     */
+    fun addLog(log: LogItem) {
 
-    @Synchronized
-    fun writeLog(log: LogItem) {
-        logBufferList.add(log)
-        flushLog(false)
+        lockBlock(logDataLock) {
+            logBufferList.add(log)
+        }
+
+        //放在这里是为了避免写入文件的耗时操作影响到添加log的速度
+        writeLog(false)
     }
 
-    private fun flushLog(forceFlush: Boolean = false) {
-        "flushLog forceFlush:$forceFlush,threadInfo:${getThreadInfo()}".println()
-        if (logBufferList.size <= 0) return
-        if (logBufferList.size >= config.maxCacheSize || forceFlush) {
-            "满足写入条件，开始写入日志".println()
-            val logBufferMap = logBufferList.groupBy {
-                getOperateFile(it)
-            }.filter {
-                it.key?.exists() == true
+    private fun writeLog(forceWrite: Boolean) {
+
+        if (!forceWrite && logBufferList.size < config.maxCacheSize) {
+            "非强制写入并且日志数量不足${config.maxCacheSize}条，不写入".println()
+            return
+        }
+
+        println("满足写入条件，日志总条数：${logBufferList.size},是否强制写入：$forceWrite")
+
+        //准备数据
+        lockBlock(logDataLock) {
+
+            "logBufferList数量，${logBufferList.size}".println()
+            if (logBufferList.size == 0) {
+                return@lockBlock
             }
-
-
-            logBufferMap.forEach { (file, logList) ->
-                file?.run {
-                    writeLogTaskList.add(doFileWrite(file, logList))
-                }
-            }
-
-            "执行写入任务，任务数量:${writeLogTaskList.size}".println()
-            writeLogExecutor.invokeAll(writeLogTaskList)
-            "写入任务执行完毕".println()
-
-            writeLogTaskList.clear()
+            //把logBufferList的数据存到一个list中
+            val tempLogList = mutableListOf<LogItem>()
+            tempLogList.addAll(logBufferList)
+            "tmpLogList数量：${tempLogList.size}".println()
             logBufferList.clear()
-            lastWriteTime = System.currentTimeMillis()
+            "清空 logBufferList,${logBufferList.size}".println()
+            //异步执行写入文件的操作
+            flushLog(tempLogList)
+        }
 
+
+    }
+
+    private fun flushLog(tempLogList: MutableList<LogItem>) {
+        if (tempLogList.size == 0) {
+            "满足写入条件，但是日志数量为0，不写入".println()
+            return
+        }
+        ThreadPoolManager.instance.ioThreadPoolExecutor.execute {
+            lockBlock(writeLogLock) {
+
+                "开始写入日志，日志总条数：${tempLogList.size}".println()
+                val logBufferMap = tempLogList.groupBy {
+                    getOperateFile(it)
+                }
+                "数据准备完毕：${logBufferMap.size}个文件需要写入".println()
+
+                logBufferMap.forEach { (file, logList) ->
+                    doFileWrite(file, logList).call()
+                }
+//                    ThreadPoolManager.instance.ioThreadPoolExecutor.invokeAll(writeFileTask)
+//
+//                    logBufferMap.forEach {
+//                        doFileWrite(file,logli)
+//                    }
+
+
+                lastWriteTime = System.currentTimeMillis()
+
+                "文件写入操作全部完成".println()
+
+            }
         }
 
     }
 
     private fun doFileWrite(file: File, logList: List<LogItem>): Callable<Boolean> {
+
         return Callable {
-            synchronized(file) {
-                runCatching {
-                    if (!file.exists()) {
-                        file.createNewFile()
-                    }
-                    "写文件的线程信息：${getThreadInfo()}".println()
-                    val sb = StringBuilder()
-                    logList.forEach { logItem ->
-                        sb.append(
-                            FileLogFormatter.instance.formatToStr(logItem)
-                        )
-                    }
-                    //将内容追加到文件中
-                    BufferedWriter(FileWriter(file, true)).use { bw ->
-                        bw.append(sb.toString())
-                        bw.flush()
-                    }
-                    "${file.name} 日志写入完成，条数：${logList.size}".println()
-                    sb.clear()
+            runCatching {
+                if (!file.exists()) {
+                    file.createNewFile()
                 }
+                "开始写入到文件:${file.name}".println()
+                val sb = StringBuilder()
+                logList.forEach { logItem ->
+                    sb.append(
+                        FileLogFormatter.instance.formatToStr(logItem)
+                    )
+                }
+                //将内容追加到文件中
+                BufferedWriter(FileWriter(file, true)).use { bw ->
+                    bw.append(sb.toString())
+                    bw.flush()
+                }
+                "${file.name} 日志写入完成，条数：${logList.size}".println()
+                sb.clear()
                 true
-            }
+            }.onFailure {
+                "${file.name} 写入日志失败:${it.message}".println()
+                it.printStackTrace()
+            }.getOrDefault(false)
         }
+
     }
 
     /**
@@ -175,40 +222,35 @@ internal class FileLogWriter private constructor(
 
     private fun clearExpiredLogFiles() {
         "clearExpiredLogFiles storageDuration:${config.storageDuration}".println()
-
         if (config.storageDuration <= 0) {
             return
         }
-        existLogFileList = listLogDirFiles()
-
+        updateExistLogFileList()
+        val hasDelete = AtomicBoolean(false)
         //计算过期时间点
         val expiredTime = System.currentTimeMillis() - config.storageDuration * 60 * 60 * 1000
-
         "过期时间点:${
             SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(
                 expiredTime
             )
         }".println()
-
         existLogFileList.filter {
             "${it.name} 最后修改时间:${
                 SimpleDateFormat(
-                    "yyyy-MM-dd HH:mm:ss",
-                    Locale.getDefault()
+                    "yyyy-MM-dd HH:mm:ss", Locale.getDefault()
                 ).format(it.lastModified())
             }".println()
 
             it.isFile && it.lastModified() < expiredTime
         }.forEach {
             "删除过期日志文件:${it.name}".println()
-            synchronized(it) {
-                it.delete()
-            }
+            it.delete()
+            hasDelete.set(true)
         }
-
         //重新获取一下文件列表
-        updateExistLogFileList()
-
+        if (hasDelete.get()) {
+            updateExistLogFileList()
+        }
     }
 
 
@@ -217,6 +259,7 @@ internal class FileLogWriter private constructor(
      * @return List<File>
      */
     private fun listLogDirFiles(): List<File> {
+
         val logFileDir = File(logFileDir)
         if (!logFileDir.exists()) {
             return emptyList()
@@ -232,8 +275,9 @@ internal class FileLogWriter private constructor(
      * @param filePrefix String
      * @return File?
      */
-    @Synchronized
-    private fun getOperateFile(log: LogItem): File? = runCatching {
+    private fun getOperateFile(log: LogItem): File {
+
+//        "getOperateFile:${log.timeMillis}".println()
         //当前年-月-日-时
         val logTime = SimpleDateFormat(
             "yyyy-MM-dd-HH", Locale.getDefault()
@@ -258,7 +302,7 @@ internal class FileLogWriter private constructor(
                 it.createNewFile()
             }
             updateExistLogFileList()
-            return@runCatching newFile
+            return newFile
         }
 
         //获取当前时间点文件名的最大index,实际上直接获取列表数量即可
@@ -282,21 +326,47 @@ internal class FileLogWriter private constructor(
         }
         updateExistLogFileList()
 
-        return@runCatching newFile
-    }.getOrDefault(null)
+        return newFile
+
+    }
 
 
     private fun updateExistLogFileList() {
-        existLogFileList = listLogDirFiles()
+        lockBlock(updateFileLock) {
+            "更新日志文件列表".println()
+            existLogFileList = listLogDirFiles()
+        }
+
     }
 
 
     override fun onAppExit() {
         super.onAppExit()
-        flushLog(true)
-//        ThreadPoolManager.instance.ioThreadPoolExecutor.shutdown()
+        println("FileLogWriter onAppExit 写入日志")
+        writeLog(true)
 
         AppManager.removeAppStateListener(this)
+
+    }
+
+
+    private fun lockBlock(lock: ReentrantLock, timeoutSeconds: Long = 10, block: () -> Unit) {
+        try {
+
+            if (lock.tryLock(timeoutSeconds, TimeUnit.SECONDS)) {
+//                lock.info().println()
+//                "锁获取成功".println()
+                block()
+            } else {
+                "获取锁超时失败".println()
+            }
+        } finally {
+            if (lock.isHeldByCurrentThread) {
+                lock.unlock()
+//                "释放锁成功".println()
+            }
+//            lock.info().println()
+        }
 
     }
 

@@ -15,8 +15,11 @@ class App : Application() {
         AppManager.init(this, BuildConfig.DEBUG)
         loggerDebug = true
         val fileLogPrinter = FileLogPrinter.getInstance(
-            FileLogConfig().enable(true).storageDuration(1).showStackTrace(false)
-                .writeLogInterval(60).maxFileSize(1024 * 1024 * 2)//2M
+            FileLogConfig().enable(true)
+                .storageDuration(1)
+//                .showStackTrace(false)
+                .writeLogInterval(20)
+                .maxFileSize(1024 * 1024 * 2)//2M
 //                        .showTimestamp(false)
 //                        .showStackTrace(false)
         )
