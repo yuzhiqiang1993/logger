@@ -20,7 +20,7 @@ class ConsoleLogPrinter private constructor(
         @Volatile
         private var instance: ConsoleLogPrinter? = null
         fun getInstance(
-            logConfig: ConsoleLogConfig = ConsoleLogConfig()
+            logConfig: ConsoleLogConfig = ConsoleLogConfig.Builder().build()
         ): ConsoleLogPrinter {
             if (instance == null) {
                 synchronized(ConsoleLogPrinter::class.java) {

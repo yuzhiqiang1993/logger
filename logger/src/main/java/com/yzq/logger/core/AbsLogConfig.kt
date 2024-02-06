@@ -6,19 +6,17 @@ package com.yzq.logger.core
  * @author : yuzhiqiang
  */
 
-abstract class AbsLogConfig {
+abstract class AbsLogConfig(
 
     //是否启用
-    open var enable = false
+    val enable: Boolean = false,
 
     //默认tag
-    open var tag = "Logger"
+    val tag: String = "Logger",
 
     //是否显示堆栈信息
-    var showStackTrace = true
+    val showStackTrace: Boolean = true,
 
     //是否显示线程信息
-    var showThreadInfo = true
-
-
-}
+    val showThreadInfo: Boolean = true
+)

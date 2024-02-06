@@ -16,19 +16,26 @@ internal object FileLogConstant {
     //日志文件的最大大小，单位字节，超过这个大小的后会轮转日志文件
     const val maxFileSize: Int = 1 * 1024 * 1024 * 5
 
-//    //日志文件的间隔时间，单位小时，超过这个时间后会轮转日志文件
-//    var rotationInterval: Int = 1
+    //日志文件的最小大小，单位字节，最小100KB
+    const val minFileSize: Int = 1024 * 100
+
 
     //日志文件名字的前缀
     const val filePrefix: String = "log"
 
 
-    //日志阻塞队列的最大容量
+    //日志阻塞队列的容量
     const val logQueueCapacity: Int = 1000
 
-    //主动触发日志写入的间隔时间，单位秒
-    const val writeLogInterval: Long = 10
+    const val minLogQueueCapacity: Int = 100
 
-    //写入前存放在内存中的最大日志条数
-    const val maxCacheSize: Int = 500
+    //主动触发日志写入的间隔时间，单位秒
+    const val writeLogInterval: Long = 60
+
+    const val minWriteLogInterval: Long = 10
+
+    //写入前存放在内存中的日志条数
+    const val maxCacheSize: Int = 200
+
+    const val minCacheSize: Int = 10
 }

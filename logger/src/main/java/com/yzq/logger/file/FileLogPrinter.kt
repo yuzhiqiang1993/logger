@@ -42,18 +42,18 @@ class FileLogPrinter private constructor(override val config: FileLogConfig) :
         @Volatile
         private var fileLogWriter: FileLogWriter? = null
 
-        fun getInstance(config: FileLogConfig = FileLogConfig()): FileLogPrinter {
+        fun getInstance(config: FileLogConfig = FileLogConfig.Builder().build()): FileLogPrinter {
             return instance ?: synchronized(this) {
                 instance ?: FileLogPrinter(config).also {
-                    if (config.logQueueCapacity <= FileLogConstant.logQueueCapacity) {
-                        config.logQueueCapacity = FileLogConstant.logQueueCapacity
+                    if (config.logQueueCapacity <= FileLogConstant.minLogQueueCapacity) {
+                        throw IllegalArgumentException("logQueueCapacity must be greater than ${FileLogConstant.minLogQueueCapacity}")
                     }
                     //初始化阻塞队列
                     it.logBlockingQueue = LinkedBlockingQueue(config.logQueueCapacity)
 
                     //写入日志的间隔时间不能小于默认值，但是也不能大于
-                    if (config.writeLogInterval < FileLogConstant.writeLogInterval) {
-                        config.writeLogInterval = FileLogConstant.writeLogInterval
+                    if (config.writeLogInterval < FileLogConstant.minWriteLogInterval) {
+                        throw IllegalArgumentException("writeLogInterval must be greater than ${FileLogConstant.minWriteLogInterval}")
                     }
                     instance = it
                     fileLogWriter = FileLogWriter.getInstance(config)

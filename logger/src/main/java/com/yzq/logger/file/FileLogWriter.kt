@@ -64,7 +64,7 @@ internal class FileLogWriter private constructor(
         var instance: FileLogWriter? = null
 
         fun getInstance(
-            config: FileLogConfig = FileLogConfig()
+            config: FileLogConfig
         ): FileLogWriter {
             return instance ?: synchronized(this) {
                 instance ?: FileLogWriter(config).also {
@@ -78,17 +78,7 @@ internal class FileLogWriter private constructor(
     }
 
     private fun init() {
-        if (config.maxCacheSize <= FileLogConstant.maxCacheSize) {
-            config.maxCacheSize = FileLogConstant.maxCacheSize
-        }
 
-        if (config.writeLogInterval <= FileLogConstant.writeLogInterval) {
-            config.writeLogInterval = FileLogConstant.writeLogInterval
-        }
-
-        if (config.dirName.isEmpty()) {
-            config.dirName = ".log"
-        }
         logFileDir =
             "${AppStorage.Internal.filesPath}${File.separator}${config.dirName}${File.separator}"
 
