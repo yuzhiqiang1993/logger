@@ -8,10 +8,7 @@ import com.yzq.logger.core.AbsPrinter
  * @description: 自定义的打印器，例如上传到服务器等等操作
  * @author : yuzhiqiang
  */
-class CustomerPrinter : AbsPrinter(CustomerConfig().apply {
-    enable = true
-    tag = "CustomerPrinter"
-}, CustomerFormater()) {
+class CustomerPrinter : AbsPrinter(CustomerConfig(), CustomerFormater()) {
     override fun print(logType: LogType, tag: String?, vararg content: Any) {
         val finalTag = tag ?: config.tag
 

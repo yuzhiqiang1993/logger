@@ -2,4 +2,4 @@ package com.yzq.logger_demo.customer
 
 import com.yzq.logger.core.AbsLogConfig
 
-class CustomerConfig : AbsLogConfig()
+class CustomerConfig : AbsLogConfig(true, "CustomerConfig")
