@@ -12,8 +12,7 @@ import kotlin.math.min
  */
 class ConsoleLogPrinter private constructor(
     private val consoleLogConfig: ConsoleLogConfig
-) :
-    AbsPrinter(consoleLogConfig, ConsoleLogFormatter.getInstance(consoleLogConfig)) {
+) : AbsPrinter(consoleLogConfig, ConsoleLogFormatter.getInstance(consoleLogConfig)) {
 
 
     companion object {
@@ -35,9 +34,7 @@ class ConsoleLogPrinter private constructor(
 
 
     override fun print(
-        logType: LogType,
-        tag: String?,
-        vararg content: Any
+        logType: LogType, tag: String?, vararg content: Any
     ) {
         if (!consoleLogConfig.enable) return
         val finalTag = tag ?: config.tag
