@@ -73,16 +73,6 @@ materialDialog = "3.3.0"
 dateTimePicker = "0.6.3"
 threetenabp = "1.4.6"
 
-#阿里EMAS
-alicloudAndroidApm = "1.1.1.0-open"
-alicloudAndroidBeacon = "1.0.8"
-alicloudAndroidHaAdapter = "1.1.6.2-open"
-alicloudAndroidHaCrashreporter = "1.3.0"
-alicloudAndroidPush = "3.8.6.1"
-alicloudAndroidTlog = "1.1.5.0-open"
-alicloudAndroidUt = "5.4.5"
-alicloudAndroidUtdid = "2.6.0"
-alicloudAndroidUtils = "2.0.0"
 junit = "4.13.2"
 androidx-test-ext-junit = "1.1.5"
 espresso-core = "3.5.1"
@@ -182,16 +172,6 @@ xeonyu-location-tencent = { group = "com.xeonyu", name = "location-tencent", ver
 xeonyu-location-baidu = { group = "com.xeonyu", name = "location-baidu", version.ref = "xeonLocationBaidu" }
 xeonyu-network-status = { group = "com.xeonyu", name = "network-status", version.ref = "xeonNetworkStatus" }
 
-#阿里emas
-alicloud-android-apm = { module = "com.aliyun.ams:alicloud-android-apm", version.ref = "alicloudAndroidApm" }
-alicloud-android-beacon = { module = "com.aliyun.ams:alicloud-android-beacon", version.ref = "alicloudAndroidBeacon" }
-alicloud-android-ha-adapter = { module = "com.aliyun.ams:alicloud-android-ha-adapter", version.ref = "alicloudAndroidHaAdapter" }
-alicloud-android-ha-crashreporter = { module = "com.aliyun.ams:alicloud-android-ha-crashreporter", version.ref = "alicloudAndroidHaCrashreporter" }
-alicloud-android-push = { module = "com.aliyun.ams:alicloud-android-push", version.ref = "alicloudAndroidPush" }
-alicloud-android-tlog = { module = "com.aliyun.ams:alicloud-android-tlog", version.ref = "alicloudAndroidTlog" }
-alicloud-android-ut = { module = "com.aliyun.ams:alicloud-android-ut", version.ref = "alicloudAndroidUt" }
-alicloud-android-utdid = { module = "com.aliyun.ams:alicloud-android-utdid", version.ref = "alicloudAndroidUtdid" }
-alicloud-android-utils = { module = "com.aliyun.ams:alicloud-android-utils", version.ref = "alicloudAndroidUtils" }
 
 #高德
 gaode-location = { group = "com.amap.api", name = "location", version.ref = "gaodeLocation" }
