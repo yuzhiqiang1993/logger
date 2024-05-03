@@ -1,6 +1,15 @@
 plugins {
     alias(libs.plugins.xeonyu.application)
+    alias(libs.plugins.xeonyu.dependencyManager)
 }
+
+dependencyManager {
+    //依赖分析
+    analysis {
+        enable = true
+    }
+}
+
 
 android {
     namespace = "com.yzq.logger_demo"
@@ -32,13 +41,13 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.google.material)
     implementation(libs.moshiKotlin)
-//    implementation(libs.xeonyu.logger)
-    implementation(project(":logger"))
+    implementation(libs.xeonyu.application)
+    implementation(libs.xeonyu.logger)
+//    implementation(project(":logger"))
 
 }

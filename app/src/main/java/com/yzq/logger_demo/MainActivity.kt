@@ -9,6 +9,7 @@ import com.yzq.logger_demo.databinding.ActivityMainBinding
 import org.json.JSONObject
 import kotlin.concurrent.thread
 
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var viewbinding: ActivityMainBinding
@@ -28,7 +29,8 @@ class MainActivity : AppCompatActivity() {
             Logger.i("onCreate")
         }
         Logger.w("onCreate", "111", 23132, arrayListOf("21312", 21131), mapOf(1 to 1, 3 to 3))
-        Logger.e("onCreate", Exception("data error"))
+        Logger.e("onCreate", 111, true, Exception("test error"))
+        Logger.et("onCreate", "异常信息")
 
         val user = User("yuzhiqiang", 18)
 

@@ -41,7 +41,7 @@ object Logger {
 
     @JvmStatic
     fun v(vararg content: Any) {
-        print(LogType.VERBOSE, content = content)
+        print(LogType.VERBOSE, null, *content)
     }
 
 
@@ -50,12 +50,12 @@ object Logger {
         tag: String,
         vararg content: Any,
     ) {
-        print(LogType.VERBOSE, tag, content)
+        print(LogType.VERBOSE, tag, *content)
     }
 
     @JvmStatic
     fun i(vararg content: Any) {
-        print(LogType.INFO, content = content)
+        print(LogType.INFO, null, *content)
     }
 
     @JvmStatic
@@ -68,7 +68,7 @@ object Logger {
 
     @JvmStatic
     fun d(vararg content: Any) {
-        print(LogType.DEBUG, content = content)
+        print(LogType.DEBUG, null, *content)
     }
 
     @JvmStatic
@@ -84,7 +84,7 @@ object Logger {
     fun w(
         vararg content: Any,
     ) {
-        print(LogType.WARN, content = content)
+        print(LogType.WARN, null, *content)
     }
 
     @JvmStatic
@@ -98,7 +98,7 @@ object Logger {
 
     @JvmStatic
     fun e(vararg content: Any) {
-        print(LogType.ERROR, content = content)
+        print(LogType.ERROR, null, *content)
     }
 
     @JvmStatic
@@ -106,7 +106,7 @@ object Logger {
         tag: String,
         vararg content: Any,
     ) {
-        print(LogType.ERROR, tag, content)
+        print(LogType.ERROR, tag, *content)
     }
 
 
@@ -114,7 +114,7 @@ object Logger {
     fun wtf(
         vararg content: Any,
     ) {
-        print(LogType.WTF, content = content)
+        print(LogType.WTF, null, *content)
     }
 
     @JvmStatic

@@ -6,8 +6,6 @@ import com.yzq.logger.Logger
 import com.yzq.logger.console.ConsoleLogConfig
 import com.yzq.logger.console.ConsoleLogPrinter
 import com.yzq.logger.core.loggerDebug
-import com.yzq.logger.file.FileLogConfig
-import com.yzq.logger.file.FileLogPrinter
 
 class App : Application() {
 
@@ -19,23 +17,25 @@ class App : Application() {
 
 
 
-        Logger.addPrinter(
-            FileLogPrinter.getInstance(
-                FileLogConfig.Builder()
-                    .enable(true)
-                    .storageDuration(1)
-//                .showStackTrace(false)
-                    .writeLogInterval(20)
-                    .maxFileSize(1024 * 1024 * 2)//2M
-//                        .showTimestamp(false)
-//                        .showStackTrace(false)
-                    .build()
+        Logger
+//            .addPrinter(
+//                FileLogPrinter.getInstance(
+//                    FileLogConfig.Builder()
+//                        .enable(true)
+//                        .storageDuration(1)
+////                .showStackTrace(false)
+//                        .writeLogInterval(20)
+//                        .maxFileSize(1024 * 1024 * 2)//2M
+////                        .showTimestamp(false)
+////                        .showStackTrace(false)
+//                        .build()
+//                )
+//            )
+            .addPrinter(
+                ConsoleLogPrinter.getInstance(
+                    ConsoleLogConfig.Builder().enable(BuildConfig.DEBUG).build()
+                )
             )
-        ).addPrinter(
-            ConsoleLogPrinter.getInstance(
-                ConsoleLogConfig.Builder().enable(BuildConfig.DEBUG).build()
-            )
-        )
 
 
 

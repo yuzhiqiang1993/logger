@@ -8,8 +8,9 @@ android {
 }
 
 dependencies {
-    implementation(libs.kotlin.stdlib)
-    implementation(libs.androidx.appcompat)
+    implementation(platform(libs.kotlin.bom.stable))
+    implementation(libs.androidx.appcompat.stable)
+    implementation(libs.androidx.recyclerview.stable)
     api(libs.xeonyu.application)
     implementation(libs.xeonyu.coroutine)
 }

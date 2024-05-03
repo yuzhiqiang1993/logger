@@ -21,10 +21,34 @@ minSdk = "23"
 targetSdk = "33"
 #AGP的版本
 agp = "8.1.0"
-material = "1.9.0"
-#AndroidX
+
+# AndroidX相关的稳定版本，组件依赖时使用
+androidxAppcompatStable = "1.3.1"
+androidxActivityKtxStable = "1.3.1"
+androidxFragmentKtxStable = "1.3.6"
+androidxCollectionKtxStable = "1.1.0"
+androidxLifecycleStable = "2.4.0"
+androidxVectordrawableStable = "1.1.0"
+androidxConstraintlayoutStable = "2.1.1"
+androidxAnnotationStable = "1.1.0"
+androidxMultidexStable = "2.0.1"
+androidxCoreStable = "1.6.0"
+androidxCoreSplashscreenStable = "1.0.0"
+androidxCoordinatorlayoutStable = "1.1.0"
+androidxSwiperefreshlayoutStable = "1.1.0"
+androidxRecyclerviewStable = "1.2.1"
+androidxViewpager2Stable = "1.0.0"
+androidxExifinterfaceStable = "1.3.3"
+androidxRoomStable = "2.4.0"
+androidxWebkitStable = "1.3.0"
+kotlinStable = "1.7.21"
+materialStable = "1.4.0"
+kotlinxCoroutinesStable = "1.6.4"
+kotlinxSerializationJsonStable = "1.5.0"
+
+#较新版本，App依赖时使用
 androidxAppcompat = "1.6.1"
-androidxActivityKtx = "1.8.2"
+androidxActivityKtx = "1.9.0"
 androidxFragmentKtx = "1.6.2"
 androidxCollectionKtx = "1.4.0"
 androidxLifecycle = "2.7.0"
@@ -32,7 +56,7 @@ androidxVectordrawable = "1.1.0"
 androidxConstraintlayout = "2.1.4"
 androidxAnnotation = "1.7.1"
 androidxMultidex = "2.0.1"
-androidxCore = "1.12.0"
+androidxCore = "1.13.0"
 androidxCoreSplashscreen = "1.0.1"
 androidxCoordinatorlayout = "1.2.0"
 androidxSwiperefreshlayout = "1.1.0"
@@ -40,64 +64,96 @@ androidxRecyclerview = "1.3.2"
 androidxViewpager2 = "1.1.0-beta02"
 androidxExifinterface = "1.3.7"
 androidxRoom = "2.6.1"
-androidxWebkit = "1.8.0"
-
+androidxWebkit = "1.10.0"
 #kotlin
-kotlin = "1.7.21"
-ksp = "1.9.0-1.0.13"
-kotlinxCoroutines = "1.7.2"
-kotlinxSerializationJson = "1.5.1"
+kotlin = "1.9.23"
+material = "1.11.0"
+ksp = "1.9.23-1.0.20"
+kotlinxCoroutines = "1.7.3"
+kotlinxSerializationJson = "1.6.3"
 
 #三方库
-theRouter = "1.2.0-beta4"
-benManesVersion = "0.47.0"
-vanniktechPublish = "0.25.3"
-okhttp = "4.11.0"
-retrofit = "2.9.0"
+theRouter = "1.2.2"
+benManesVersion = "0.51.0"
+vanniktechPublish = "0.28.0"
+okhttp = "4.12.0"
+retrofit = "2.11.0"
 retrofitKotlinxSerializationJson = "1.0.0"
-lottie = "6.1.0"
+lottie = "6.4.0"
 moshiKotlin = "1.15.0"
 utilcodex = "1.31.1"
-xxPermissions = "18.2"
+xxPermissions = "18.63"
 mmkv = "1.3.0"
 progressManager = "1.5.0"
 appStartFaster = "2.2.0"
-bannerViewPager = "3.5.11"
-jsoup = "1.16.1"
-brv = "1.4.3"
+bannerViewPager = "3.5.12"
+jsoup = "1.17.2"
+brv = "1.5.8"
 flexboxLayout = "3.0.0"
-leakcanaryAndroid = "2.12"
-coil = "2.4.0"
+leakcanaryAndroid = "2.14"
+coil = "2.6.0"
 photoView = "2.3.0"
 materialDialog = "3.3.0"
 dateTimePicker = "0.6.3"
-threetenabp = "1.4.6"
+threetenabp = "1.4.7"
 
 junit = "4.13.2"
 androidx-test-ext-junit = "1.1.5"
 espresso-core = "3.5.1"
 
 #高德map
-gaodeLocation = "6.4.2"
+gaodeLocation = "6.4.3"
 
 #我的开源库
 xeonBuildManager = "0.0.7"
+xeonDependencyManager = "1.0.1"
 xeonZxing = "2.2.9"
-xeonCordovaWebContainer = "1.0.5"
+xeonCordovaWebContainer = "1.0.6"
 xeonCordovaLib = "12.0.2"
 xeonBsDiff = "1.0.4"
-xeonLogger = "1.0.4"
-xeonApplication = "1.0.4"
-xeonCoroutine = "1.0.3"
-xeonMMKV = "1.0.0"
-xeonBinding = "1.0.0"
+xeonLogger = "1.0.6"
+xeonApplication = "1.0.7"
+xeonCoroutine = "1.0.4"
+xeonMMKV = "1.0.1"
+xeonBinding = "1.0.1"
 xeonLocationManager = "1.0.1"
 xeonLocationGaode = "1.0.1"
-xeonLocationTencent = "1.0.0"
-xeonLocationBaidu = "1.0.0"
+xeonLocationTencent = "1.0.1"
+xeonLocationBaidu = "1.0.1"
 xeonNetworkStatus = "1.0.1"
+xeonFloatView = "1.0.1"
 
 [libraries]
+
+# 稳定版本
+androidx-appcompat-stable = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppcompatStable" }
+androidx-activity-ktx-stable = { group = "androidx.activity", name = "activity-ktx", version.ref = "androidxActivityKtxStable" }
+androidx-fragment-ktx-stable = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "androidxFragmentKtxStable" }
+androidx-collection-ktx-stable = { group = "androidx.collection", name = "collection-ktx", version.ref = "androidxCollectionKtxStable" }
+androidx-lifecycle-viewmodel-ktx-stable = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "androidxLifecycleStable" }
+androidx-lifecycle-livedata-ktx-stable = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "androidxLifecycleStable" }
+androidx-lifecycle-runtime-ktx-stable = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidxLifecycleStable" }
+androidx-vectordrawable-stable = { group = "androidx.vectordrawable", name = "vectordrawable", version.ref = "androidxVectordrawableStable" }
+androidx-constraintlayout-stable = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "androidxConstraintlayoutStable" }
+androidx-coordinatorlayout-stable = { group = "androidx.coordinatorlayout", name = "coordinatorlayout", version.ref = "androidxCoordinatorlayoutStable" }
+androidx-annotation-stable = { group = "androidx.annotation", name = "annotation", version.ref = "androidxAnnotationStable" }
+androidx-multidex-stable = { group = "androidx.multidex", name = "multidex", version.ref = "androidxMultidexStable" }
+androidx-core-ktx-stable = { group = "androidx.core", name = "core-ktx", version.ref = "androidxCoreStable" }
+androidx-core-splashscreen-stable = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidxCoreSplashscreenStable" }
+androidx-swiperefreshlayout-stable = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "androidxSwiperefreshlayoutStable" }
+androidx-recyclerview-stable = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "androidxRecyclerviewStable" }
+androidx-viewpager2-stable = { group = "androidx.viewpager2", name = "viewpager2", version.ref = "androidxViewpager2Stable" }
+androidx-exifinterface-stable = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "androidxExifinterfaceStable" }
+androidx-webkit-stable = { group = "androidx.webkit", name = "webkit", version.ref = "androidxWebkitStable" }
+kotlin-bom-stable = { group = "org.jetbrains.kotlin", name = "kotlin-bom", version.ref = "kotlinStable" }
+kotlinx-coroutines-core-stable = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesStable" }
+kotlinx-coroutines-android-stable = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesStable" }
+kotlinx-serialization-json-stable = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJsonStable" }
+
+
+
+
+
 google-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 #androidX
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppcompat" }
@@ -120,10 +176,7 @@ androidx-recyclerview = { group = "androidx.recyclerview", name = "recyclerview"
 androidx-viewpager2 = { group = "androidx.viewpager2", name = "viewpager2", version.ref = "androidxViewpager2" }
 androidx-exifinterface = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "androidxExifinterface" }
 androidx-webkit = { group = "androidx.webkit", name = "webkit", version.ref = "androidxWebkit" }
-
-#kotlin
-kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
-kotlin-stdlib-jdk8 = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version.ref = "kotlin" }
+kotlin-bom = { group = "org.jetbrains.kotlin", name = "kotlin-bom", version.ref = "kotlin" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
@@ -171,6 +224,8 @@ xeonyu-location-gaode = { group = "com.xeonyu", name = "location-gaode", version
 xeonyu-location-tencent = { group = "com.xeonyu", name = "location-tencent", version.ref = "xeonLocationTencent" }
 xeonyu-location-baidu = { group = "com.xeonyu", name = "location-baidu", version.ref = "xeonLocationBaidu" }
 xeonyu-network-status = { group = "com.xeonyu", name = "network-status", version.ref = "xeonNetworkStatus" }
+xeonyu-floatview = { group = "com.xeonyu", name = "float-view", version.ref = "xeonFloatView" }
+
 
 
 #高德
@@ -182,7 +237,7 @@ gaode-location = { group = "com.amap.api", name = "location", version.ref = "gao
 #android Gradle插件
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
 #kotlin Gradle插件
-kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlinStable" }
 #KSP
 ksp-gradlePlugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 #therouter
@@ -207,8 +262,7 @@ room = ["androidx-room-ktx", "androidx-room-runtime"]
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinStable" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 therouter = { id = "cn.therouter", version.ref = "theRouter" }
@@ -219,5 +273,4 @@ vanniktechPublish = { id = "com.vanniktech.maven.publish", version.ref = "vannik
 #自定义的插件
 xeonyu-application = { id = "com.xeonyu.plugin.application", version.ref = "xeonBuildManager" }
 xeonyu-library = { id = "com.xeonyu.plugin.library", version.ref = "xeonBuildManager" }
-#xeonyu-room = { id = "com.xeonyu.plugin.room", version.ref = "buildManagerVersion" }
-#xeonyu-therouter = { id = "com.xeonyu.plugin.therouter", version.ref = "buildManagerVersion" }
+xeonyu-dependencyManager = { id = "com.xeonyu.plugin.dependencyManager", version.ref = "xeonDependencyManager" }
