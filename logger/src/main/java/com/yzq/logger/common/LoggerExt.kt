@@ -1,5 +1,6 @@
 package com.yzq.logger.common
 
+import android.graphics.Color
 import android.util.Log
 import java.io.File
 import java.text.SimpleDateFormat
@@ -110,3 +111,14 @@ internal fun formatLogContent(contentStr: String, linePrefix: String = space): S
     return sb.toString()
 }
 
+
+internal fun getLogColor(logType: LogType): Int {
+    return when (logType) {
+        LogType.VERBOSE -> Color.parseColor("#444444") // 深灰色
+        LogType.DEBUG -> Color.parseColor("#0000FF")   // 蓝色
+        LogType.INFO -> Color.parseColor("#00AA00")    // 绿色
+        LogType.WARN -> Color.parseColor("#FFA500")    // 金色
+        LogType.ERROR -> Color.parseColor("#FF0000")   // 红色
+        LogType.WTF -> Color.parseColor("#8B0000")     // 深红色
+    }
+}

@@ -1,4 +1,4 @@
-package com.yzq.logger.view
+package com.yzq.logger.view.core
 
 import com.yzq.logger.core.AbsLogConfig
 
@@ -10,15 +10,8 @@ class ViewLogConfig private constructor(builder: Builder) : AbsLogConfig(
     builder.enable, builder.tag, builder.showStackTrace, builder.showThreadInfo
 ) {
 
-    // 是否显示边框
-    val showBorder: Boolean = builder.showBorder
-
-
-    // 每行显示的字符数,最小500，最大4000
-    val lineLength: Int = builder.lineLength
-
-    //是否折叠显示
-    val isFold: Boolean = builder.isFold
+    val lineLength = builder.lineLength
+    val cacheSize = builder.cacheSize
 
 
     class Builder {
@@ -35,14 +28,11 @@ class ViewLogConfig private constructor(builder: Builder) : AbsLogConfig(
         var showThreadInfo: Boolean = true
             private set
 
-        var showBorder: Boolean = false
-            private set
-
         // 每行显示的字符数,最小500，最大4000
         var lineLength: Int = 4000
             private set
 
-        var isFold: Boolean = true
+        var cacheSize: Int = 200
             private set
 
         fun enable(enable: Boolean): Builder {
@@ -65,15 +55,6 @@ class ViewLogConfig private constructor(builder: Builder) : AbsLogConfig(
             return this
         }
 
-        fun showBorder(showBorder: Boolean): Builder {
-            this.showBorder = showBorder
-            return this
-        }
-
-        fun isFold(isFold: Boolean): Builder {
-            this.isFold = isFold
-            return this
-        }
 
         fun lineLength(lineLength: Int): Builder {
             // 检查 lineLength 是否在有效范围内
@@ -84,8 +65,18 @@ class ViewLogConfig private constructor(builder: Builder) : AbsLogConfig(
             return this
         }
 
+        fun cacheSize(cacheSize: Int): Builder {
+            if (cacheSize <= 0) {
+                throw IllegalArgumentException("cacheSize must be > 0")
+            }
+            this.cacheSize = cacheSize
+            return this
+        }
+
         fun build(): ViewLogConfig {
             return ViewLogConfig(this)
         }
+
+
     }
 }

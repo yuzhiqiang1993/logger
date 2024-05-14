@@ -47,7 +47,8 @@ dependencies {
     implementation(libs.google.material)
     implementation(libs.moshiKotlin)
     implementation(libs.xeonyu.application)
-    implementation(libs.xeonyu.logger)
-//    implementation(project(":logger"))
+    implementation(libs.xeonyu.coroutine)
+//    implementation(libs.xeonyu.logger)
+    implementation(project(":logger"))
 
 }

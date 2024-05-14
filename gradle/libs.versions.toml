@@ -4,6 +4,7 @@
 #* Compile sdk version
 #* 按照指定sdk版本进行编译  不影响实际运行  尽量写最新的，最好跟targetsdkversion版本保持一致
 #*/
+
 compileSdk = "34"
 
 #/**
@@ -23,31 +24,24 @@ targetSdk = "33"
 agp = "8.1.0"
 
 # AndroidX相关的稳定版本，组件依赖时使用
-androidxAppcompatStable = "1.3.1"
-androidxActivityKtxStable = "1.3.1"
-androidxFragmentKtxStable = "1.3.6"
-androidxCollectionKtxStable = "1.1.0"
-androidxLifecycleStable = "2.4.0"
+androidxAppcompatStable = "1.6.1"
+activityStable = "1.7.2"
+androidxActivityKtxStable = "1.7.2"
+androidxFragmentKtxStable = "1.6.2"
+androidxLifecycleStable = "2.7.0"
 androidxVectordrawableStable = "1.1.0"
-androidxConstraintlayoutStable = "2.1.1"
-androidxAnnotationStable = "1.1.0"
-androidxMultidexStable = "2.0.1"
-androidxCoreStable = "1.6.0"
-androidxCoreSplashscreenStable = "1.0.0"
-androidxCoordinatorlayoutStable = "1.1.0"
-androidxSwiperefreshlayoutStable = "1.1.0"
-androidxRecyclerviewStable = "1.2.1"
-androidxViewpager2Stable = "1.0.0"
-androidxExifinterfaceStable = "1.3.3"
-androidxRoomStable = "2.4.0"
-androidxWebkitStable = "1.3.0"
+androidxConstraintlayoutStable = "2.1.4"
+androidxAnnotationStable = "1.7.1"
+androidxCoreStable = "1.7.0"
 kotlinStable = "1.7.21"
 materialStable = "1.4.0"
 kotlinxCoroutinesStable = "1.6.4"
 kotlinxSerializationJsonStable = "1.5.0"
 
+
 #较新版本，App依赖时使用
 androidxAppcompat = "1.6.1"
+activity = "1.8.0"
 androidxActivityKtx = "1.9.0"
 androidxFragmentKtx = "1.6.2"
 androidxCollectionKtx = "1.4.0"
@@ -65,9 +59,11 @@ androidxViewpager2 = "1.1.0-beta02"
 androidxExifinterface = "1.3.7"
 androidxRoom = "2.6.1"
 androidxWebkit = "1.10.0"
+material = "1.11.0"
+cardview = "1.0.0"
+
 #kotlin
 kotlin = "1.9.23"
-material = "1.11.0"
 ksp = "1.9.23-1.0.20"
 kotlinxCoroutines = "1.7.3"
 kotlinxSerializationJson = "1.6.3"
@@ -123,43 +119,36 @@ xeonLocationBaidu = "1.0.1"
 xeonNetworkStatus = "1.0.1"
 xeonFloatView = "1.0.1"
 
+
 [libraries]
 
 # 稳定版本
 androidx-appcompat-stable = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppcompatStable" }
+androidx-activity-stable = { group = "androidx.activity", name = "activity", version.ref = "activityStable" }
 androidx-activity-ktx-stable = { group = "androidx.activity", name = "activity-ktx", version.ref = "androidxActivityKtxStable" }
 androidx-fragment-ktx-stable = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "androidxFragmentKtxStable" }
-androidx-collection-ktx-stable = { group = "androidx.collection", name = "collection-ktx", version.ref = "androidxCollectionKtxStable" }
 androidx-lifecycle-viewmodel-ktx-stable = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "androidxLifecycleStable" }
 androidx-lifecycle-livedata-ktx-stable = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "androidxLifecycleStable" }
 androidx-lifecycle-runtime-ktx-stable = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidxLifecycleStable" }
 androidx-vectordrawable-stable = { group = "androidx.vectordrawable", name = "vectordrawable", version.ref = "androidxVectordrawableStable" }
 androidx-constraintlayout-stable = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "androidxConstraintlayoutStable" }
-androidx-coordinatorlayout-stable = { group = "androidx.coordinatorlayout", name = "coordinatorlayout", version.ref = "androidxCoordinatorlayoutStable" }
 androidx-annotation-stable = { group = "androidx.annotation", name = "annotation", version.ref = "androidxAnnotationStable" }
-androidx-multidex-stable = { group = "androidx.multidex", name = "multidex", version.ref = "androidxMultidexStable" }
 androidx-core-ktx-stable = { group = "androidx.core", name = "core-ktx", version.ref = "androidxCoreStable" }
-androidx-core-splashscreen-stable = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidxCoreSplashscreenStable" }
-androidx-swiperefreshlayout-stable = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "androidxSwiperefreshlayoutStable" }
-androidx-recyclerview-stable = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "androidxRecyclerviewStable" }
-androidx-viewpager2-stable = { group = "androidx.viewpager2", name = "viewpager2", version.ref = "androidxViewpager2Stable" }
-androidx-exifinterface-stable = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "androidxExifinterfaceStable" }
-androidx-webkit-stable = { group = "androidx.webkit", name = "webkit", version.ref = "androidxWebkitStable" }
 kotlin-bom-stable = { group = "org.jetbrains.kotlin", name = "kotlin-bom", version.ref = "kotlinStable" }
-kotlinx-coroutines-core-stable = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesStable" }
 kotlinx-coroutines-android-stable = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesStable" }
 kotlinx-serialization-json-stable = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJsonStable" }
 
 
 
 
-
-google-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 #androidX
+google-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppcompat" }
+androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "androidxActivityKtx" }
 androidx-fragment-ktx = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "androidxFragmentKtx" }
 androidx-collection-ktx = { group = "androidx.collection", name = "collection-ktx", version.ref = "androidxCollectionKtx" }
+androidx-cardview = { module = "androidx.cardview:cardview", version.ref = "cardview" }
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "androidxLifecycle" }
 androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "androidxLifecycle" }
 #Lifecycles only (without ViewModel or LiveData)
@@ -177,7 +166,7 @@ androidx-viewpager2 = { group = "androidx.viewpager2", name = "viewpager2", vers
 androidx-exifinterface = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "androidxExifinterface" }
 androidx-webkit = { group = "androidx.webkit", name = "webkit", version.ref = "androidxWebkit" }
 kotlin-bom = { group = "org.jetbrains.kotlin", name = "kotlin-bom", version.ref = "kotlin" }
-kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
+
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 

@@ -12,7 +12,7 @@
         android:id="@+id/btn_skip"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="跳转"
+        android:text="跳转到Java页面"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="parent" />
 
@@ -21,6 +21,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="打印日志"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_log_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="日志视图"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="parent" />
 

@@ -6,7 +6,7 @@ import com.yzq.coroutine.thread_pool.ThreadPoolManager
 import com.yzq.logger.common.LogType
 import com.yzq.logger.common.firstStackTraceInfo
 import com.yzq.logger.core.AbsPrinter
-import com.yzq.logger.data.LogItem
+import com.yzq.logger.data.FileLogItem
 import java.lang.Thread.currentThread
 import java.util.concurrent.LinkedBlockingQueue
 
@@ -20,7 +20,7 @@ class FileLogPrinter private constructor(override val config: FileLogConfig) :
 
 
     //存放日志的阻塞队列
-    private var logBlockingQueue: LinkedBlockingQueue<LogItem>? = null
+    private var logBlockingQueue: LinkedBlockingQueue<FileLogItem>? = null
 
     //只有一个线程的线程池
     private val singleThreadPoolExecutor by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
@@ -75,7 +75,8 @@ class FileLogPrinter private constructor(override val config: FileLogConfig) :
 
         if (logType.level >= config.minLevel.level) {
             //将日志加入到阻塞队列中，等待写入，如果队列满了，则丢弃，不会阻塞，不会抛出异常
-            logBlockingQueue?.offer(LogItem(
+            logBlockingQueue?.offer(
+                FileLogItem(
                 tag ?: config.tag, logType, System.currentTimeMillis(), content = content,
             ).also {
                 if (config.showThreadInfo) {

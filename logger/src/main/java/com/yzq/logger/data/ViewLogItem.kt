@@ -1,6 +1,7 @@
 package com.yzq.logger.data
 
 import com.yzq.logger.common.LogType
+import java.util.UUID
 
 
 /**
@@ -8,11 +9,8 @@ import com.yzq.logger.common.LogType
  * @author : yuzhiqiang
  */
 
-class LogItem(
-    val tag: String,
+class ViewLogItem(
+    val id: String = UUID.randomUUID().toString(),
     val logType: LogType,
-    var timeMillis: Long,
-    var threadName: String? = null,
-    var traceInfo: String? = null,
-    vararg val content: Any,
+    val content: String
 )

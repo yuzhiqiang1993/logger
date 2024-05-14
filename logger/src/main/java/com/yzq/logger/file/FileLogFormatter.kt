@@ -3,7 +3,7 @@ package com.yzq.logger.file
 import com.yzq.logger.common.formatLogContent
 import com.yzq.logger.common.formatLogHeader
 import com.yzq.logger.core.ILogFormatter
-import com.yzq.logger.data.LogItem
+import com.yzq.logger.data.FileLogItem
 
 
 /**
@@ -19,7 +19,7 @@ internal class FileLogFormatter private constructor() : ILogFormatter {
         }
     }
 
-    override fun formatToStr(logItem: LogItem): String {
+    override fun formatToStr(logItem: FileLogItem): String {
         val sb = StringBuilder()
             .appendLine(
                 formatLogHeader(

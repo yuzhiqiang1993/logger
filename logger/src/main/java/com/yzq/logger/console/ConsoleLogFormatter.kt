@@ -62,7 +62,7 @@ internal class ConsoleLogFormatter private constructor(private val config: Conso
         traceInfo: String?,
     ): String {
         val sb = StringBuilder()
-        if (config.showBorder != false) {
+        if (config.showBorder) {
             sb.appendLine("┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────")
             sb.appendLine(
                 "│ ${

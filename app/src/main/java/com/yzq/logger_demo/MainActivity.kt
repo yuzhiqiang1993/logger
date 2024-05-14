@@ -1,9 +1,11 @@
 package com.yzq.logger_demo
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.yzq.logger.Logger
 import com.yzq.logger.common.LogType
+import com.yzq.logger.view.log_view.LogViewActivity
 import com.yzq.logger_demo.data.User
 import com.yzq.logger_demo.databinding.ActivityMainBinding
 import org.json.JSONObject
@@ -66,11 +68,19 @@ class MainActivity : AppCompatActivity() {
 
         }
 
+        viewbinding.btnLogView.setOnClickListener {
+            val intent = Intent(this, LogViewActivity::class.java)
+            startActivity(intent)
+        }
+
 
         //循环打印1000次
 //        for (i in 0..1000) {
 //            Logger.i("循环打印$i")
 //        }
+
+        intent
+
 
     }
 

@@ -6,7 +6,7 @@ import com.yzq.application.AppStorage
 import com.yzq.coroutine.interval.interval
 import com.yzq.coroutine.thread_pool.ThreadPoolManager
 import com.yzq.logger.core.println
-import com.yzq.logger.data.LogItem
+import com.yzq.logger.data.FileLogItem
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
@@ -36,7 +36,7 @@ internal class FileLogWriter private constructor(
 
 
     //用于存放阻塞队列过来的日志
-    private val logBufferList = mutableListOf<LogItem>()
+    private val logBufferList = mutableListOf<FileLogItem>()
 
 
     //最后一次写入的时间
@@ -104,7 +104,7 @@ internal class FileLogWriter private constructor(
      * @param log LogItem?
      * @param forceFlush Boolean
      */
-    fun addLog(log: LogItem) {
+    fun addLog(log: FileLogItem) {
 
         lockBlock(logDataLock) {
             logBufferList.add(log)
@@ -131,7 +131,7 @@ internal class FileLogWriter private constructor(
                 return@lockBlock
             }
             //把logBufferList的数据存到一个list中
-            val tempLogList = mutableListOf<LogItem>()
+            val tempLogList = mutableListOf<FileLogItem>()
             tempLogList.addAll(logBufferList)
             "tmpLogList数量：${tempLogList.size}".println()
             logBufferList.clear()
@@ -143,7 +143,7 @@ internal class FileLogWriter private constructor(
 
     }
 
-    private fun flushLog(tempLogList: MutableList<LogItem>) {
+    private fun flushLog(tempLogList: MutableList<FileLogItem>) {
         if (tempLogList.size == 0) {
             "满足写入条件，但是日志数量为0，不写入".println()
             return
@@ -176,7 +176,7 @@ internal class FileLogWriter private constructor(
 
     }
 
-    private fun doFileWrite(file: File, logList: List<LogItem>): Callable<Boolean> {
+    private fun doFileWrite(file: File, logList: List<FileLogItem>): Callable<Boolean> {
 
         return Callable {
             runCatching {
@@ -265,7 +265,7 @@ internal class FileLogWriter private constructor(
      * @param filePrefix String
      * @return File?
      */
-    private fun getOperateFile(log: LogItem): File {
+    private fun getOperateFile(log: FileLogItem): File {
 
 //        "getOperateFile:${log.timeMillis}".println()
         //当前年-月-日-时
