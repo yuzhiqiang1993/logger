@@ -59,7 +59,7 @@ class LogViewActivity : AppCompatActivity() {
 
     private fun observeData() {
         lifecycleScope.launchSafety {
-            logVm.logsSharedFlow.collect {
+            logVm.logsSharedFlow?.collect {
                 logAdapter.addData(it)
             }
         }
@@ -93,7 +93,7 @@ class LogViewActivity : AppCompatActivity() {
         }
 
         binding.tvClear.setOnClickListener {
-            logVm.logsSharedFlow.resetReplayCache()
+            logVm.logsSharedFlow?.resetReplayCache()
             logAdapter.clearData()
         }
 

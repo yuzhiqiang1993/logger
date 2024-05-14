@@ -32,7 +32,7 @@ class ViewLogConfig private constructor(builder: Builder) : AbsLogConfig(
         var lineLength: Int = 4000
             private set
 
-        var cacheSize: Int = 200
+        var cacheSize: Int = 1000
             private set
 
         fun enable(enable: Boolean): Builder {
@@ -66,8 +66,8 @@ class ViewLogConfig private constructor(builder: Builder) : AbsLogConfig(
         }
 
         fun cacheSize(cacheSize: Int): Builder {
-            if (cacheSize <= 0) {
-                throw IllegalArgumentException("cacheSize must be > 0")
+            if (cacheSize < 0) {
+                throw IllegalArgumentException("cacheSize must be >= 0")
             }
             this.cacheSize = cacheSize
             return this

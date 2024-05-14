@@ -19,17 +19,20 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 
 internal class ViewLogVm private constructor() : ViewModel() {
 
-    val logsSharedFlow: MutableSharedFlow<ViewLogItem> = MutableSharedFlow(
-        replay = InternalViewLogConfig.cacheSize,
-        extraBufferCapacity = 0,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
+    var logsSharedFlow: MutableSharedFlow<ViewLogItem>? = null
 
     fun emitLog(logType: LogType, tag: String, vararg content: Any) {
+        if (logsSharedFlow == null) {
+            logsSharedFlow = MutableSharedFlow(
+                replay = InternalViewLogConfig.cacheSize,
+                extraBufferCapacity = 0,
+                onBufferOverflow = BufferOverflow.DROP_OLDEST
+            )
+        }
 
         viewModelScope.launchSafety(Dispatchers.IO) {
             val logStr = ViewLogFormatter.formatToStr(logType, tag, *content)
-            logsSharedFlow.tryEmit(ViewLogItem(logType = logType, content = logStr))
+            logsSharedFlow?.tryEmit(ViewLogItem(logType = logType, content = logStr))
         }
     }
 
