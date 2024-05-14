@@ -30,9 +30,48 @@ implementation("com.xeonyu:logger:1.0.7")
 **代码示例**
 
 ```kotlin
-/*打印*/
-Logger.v("onCreate")
-Logger.d("onCreate")
+AppManager.init(this, BuildConfig.DEBUG)
+
+
+val consoleLogPrinter = ConsoleLogPrinter.getInstance(
+    ConsoleLogConfig.Builder().enable(true)
+        .showStackTrace(true)
+        .showThreadInfo(true)
+        .lineLength(1000)
+        .showBorder(true)
+        .tag("customeTag")
+        .build()
+)
+val fileLogPrinter = FileLogPrinter.getInstance(
+    FileLogConfig.Builder().enable(true)
+        .writeLogInterval(10)
+        .logCapacity(100)
+        .memoryCacheSize(100)
+        .build()
+)
+
+
+val viewLogPrinter = ViewLogPrinter.getInstance(
+    ViewLogConfig.Builder().enable(true).showStackTrace(false).showThreadInfo(true)
+        .cacheSize(10).build()
+)
+
+
+Logger.addPrinter(consoleLogPrinter)
+    .addPrinter(fileLogPrinter)
+    .addPrinter(viewLogPrinter)
+
+
+
+Logger.i("Logger", "开始打印不同等级的日志")
+Logger.vt("customeTag", "asdsa", 112)
+Logger.it("customeTag", "asdsa", 112)
+Logger.dt("customeTag", "asdsa", 112)
+Logger.et("customeTag", "asdsa", 112)
+Logger.wt("customeTag", "asdsa", 112)
+Logger.wtft("customeTag", "asdsa", 112)
+
+
 /*子线程打印*/
 thread {
     Logger.i("onCreate")

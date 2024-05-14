@@ -20,17 +20,23 @@ class App : Application() {
         AppManager.init(this, BuildConfig.DEBUG)
         loggerDebug = true
 
-//        val fileLogPrinter = FileLogPrinter.getInstance(
-//            FileLogConfig.Builder()
-//                .enable(true)
-//                .storageDuration(1)
-////                .showStackTrace(false)
-//                .writeLogInterval(20)
-//                .maxFileSize(1024 * 1024 * 2)//2M
-////                        .showTimestamp(false)
-////                        .showStackTrace(false)
-//                .build()
-//        )
+
+        val consoleLogPrinter = ConsoleLogPrinter.getInstance(
+            ConsoleLogConfig.Builder().enable(true)
+                .showStackTrace(true)
+                .showThreadInfo(true)
+                .lineLength(1000)
+                .showBorder(true)
+                .tag("customeTag")
+                .build()
+        )
+        val fileLogPrinter = FileLogPrinter.getInstance(
+            FileLogConfig.Builder().enable(true)
+                .writeLogInterval(10)
+                .logCapacity(100)
+                .memoryCacheSize(100)
+                .build()
+        )
 
 
         val viewLogPrinter = ViewLogPrinter.getInstance(
@@ -39,28 +45,9 @@ class App : Application() {
         )
 
 
-        val consoleLogConfig = ConsoleLogConfig.Builder().enable(true)
-            .showStackTrace(true)
-            .showThreadInfo(true)
-            .lineLength(1000)
-            .showBorder(true)
-            .tag("customeTag")
-            .build()
-
-        Logger
-            .addPrinter(
-                FileLogPrinter.getInstance(
-                    FileLogConfig.Builder().enable(true)
-                        .writeLogInterval(10)
-                        .logCapacity(100)
-                        .memoryCacheSize(100)
-                        .build()
-                )
-            )
+        Logger.addPrinter(consoleLogPrinter)
+            .addPrinter(fileLogPrinter)
             .addPrinter(viewLogPrinter)
-            .addPrinter(
-                ConsoleLogPrinter.getInstance(consoleLogConfig)
-            )
 
 
 
