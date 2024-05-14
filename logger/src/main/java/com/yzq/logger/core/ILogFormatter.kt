@@ -2,7 +2,7 @@ package com.yzq.logger.core
 
 import android.util.Log
 import com.yzq.logger.common.LogType
-import com.yzq.logger.data.FileLogItem
+import com.yzq.logger.data.LogItem
 
 
 /**
@@ -15,7 +15,7 @@ interface ILogFormatter {
         return parseContent(*content)
     }
 
-    fun formatToStr(logItem: FileLogItem): String {
+    fun formatToStr(logItem: LogItem): String {
         return formatToStr(logItem.logType, logItem.tag, *logItem.content)
     }
 

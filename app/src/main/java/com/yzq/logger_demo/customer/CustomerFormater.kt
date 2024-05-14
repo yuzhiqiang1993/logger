@@ -9,7 +9,7 @@ import com.yzq.logger.core.ILogFormatter
  * @author : yuzhiqiang
  */
 
-class CustomerFormater : ILogFormatter {
+object CustomerFormater : ILogFormatter {
 
 
     override fun formatToStr(logType: LogType, tag: String, vararg content: Any): String {

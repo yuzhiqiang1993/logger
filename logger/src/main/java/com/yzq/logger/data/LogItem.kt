@@ -8,7 +8,7 @@ import com.yzq.logger.common.LogType
  * @author : yuzhiqiang
  */
 
-class FileLogItem(
+class LogItem(
     val tag: String,
     val logType: LogType,
     var timeMillis: Long,

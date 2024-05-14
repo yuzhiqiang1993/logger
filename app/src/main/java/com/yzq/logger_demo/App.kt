@@ -7,6 +7,8 @@ import com.yzq.logger.Logger
 import com.yzq.logger.console.ConsoleLogConfig
 import com.yzq.logger.console.ConsoleLogPrinter
 import com.yzq.logger.core.loggerDebug
+import com.yzq.logger.file.FileLogConfig
+import com.yzq.logger.file.FileLogPrinter
 import com.yzq.logger.view.core.ViewLogConfig
 import com.yzq.logger.view.core.ViewLogPrinter
 
@@ -36,12 +38,28 @@ class App : Application() {
                 .cacheSize(10).build()
         )
 
+
+        val consoleLogConfig = ConsoleLogConfig.Builder().enable(true)
+            .showStackTrace(true)
+            .showThreadInfo(true)
+            .lineLength(1000)
+            .showBorder(true)
+            .tag("customeTag")
+            .build()
+
         Logger
-//            .addPrinter(fileLogPrinter)
-            .addPrinter(viewLogPrinter).addPrinter(
-                ConsoleLogPrinter.getInstance(
-                    ConsoleLogConfig.Builder().enable(BuildConfig.DEBUG).build()
+            .addPrinter(
+                FileLogPrinter.getInstance(
+                    FileLogConfig.Builder().enable(true)
+                        .writeLogInterval(10)
+                        .logCapacity(100)
+                        .memoryCacheSize(100)
+                        .build()
                 )
+            )
+            .addPrinter(viewLogPrinter)
+            .addPrinter(
+                ConsoleLogPrinter.getInstance(consoleLogConfig)
             )
 
 

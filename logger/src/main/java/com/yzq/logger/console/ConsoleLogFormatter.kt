@@ -11,19 +11,7 @@ import com.yzq.logger.core.ILogFormatter
  * @description: 默认的内容格式化器
  * @author : yuzhiqiang
  */
-internal class ConsoleLogFormatter private constructor(private val config: ConsoleLogConfig) :
-    ILogFormatter {
-
-
-    companion object {
-        @Volatile
-        private var instance: ConsoleLogFormatter? = null
-        fun getInstance(config: ConsoleLogConfig): ConsoleLogFormatter {
-            return instance ?: synchronized(this) {
-                instance ?: ConsoleLogFormatter(config).also { instance = it }
-            }
-        }
-    }
+internal object ConsoleLogFormatter : ILogFormatter {
 
 
     /**
@@ -37,9 +25,10 @@ internal class ConsoleLogFormatter private constructor(private val config: Conso
         val contentStr = parseContent(*content)
 
         val threadName =
-            config.showThreadInfo.takeIf { it }?.let { Thread.currentThread().name }
+            InternalConsoleConfig.showThreadInfo.takeIf { it }?.let { Thread.currentThread().name }
         val traceInfo =
-            config.showStackTrace.takeIf { it }?.let { Throwable().firstStackTraceInfo() }
+            InternalConsoleConfig.showStackTrace.takeIf { it }
+                ?.let { Throwable().firstStackTraceInfo() }
 
 
         return buildLogStr(tag, contentStr, threadName, System.currentTimeMillis(), traceInfo)
@@ -62,7 +51,7 @@ internal class ConsoleLogFormatter private constructor(private val config: Conso
         traceInfo: String?,
     ): String {
         val sb = StringBuilder()
-        if (config.showBorder) {
+        if (InternalConsoleConfig.showBorder) {
             sb.appendLine("┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────")
             sb.appendLine(
                 "│ ${

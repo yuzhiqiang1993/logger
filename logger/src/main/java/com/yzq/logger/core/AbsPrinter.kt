@@ -8,9 +8,7 @@ import com.yzq.logger.common.LogType
  * @author : yuzhiqiang
  */
 
-abstract class AbsPrinter(open val config: AbsLogConfig, val formatter: ILogFormatter) {
-
-
+abstract class AbsPrinter {
     /**
      * 打印
      * @param logType LogType

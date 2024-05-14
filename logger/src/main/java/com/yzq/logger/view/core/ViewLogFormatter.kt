@@ -11,20 +11,8 @@ import com.yzq.logger.core.ILogFormatter
  * @description: 视图格格式化器
  * @author : yuzhiqiang
  */
-internal class ViewLogFormatter private constructor(private val config: ViewLogConfig) :
+internal object ViewLogFormatter :
     ILogFormatter {
-
-    companion object {
-        @Volatile
-        private var instance: ViewLogFormatter? = null
-
-
-        fun getInstance(config: ViewLogConfig): ViewLogFormatter {
-            return instance ?: synchronized(this) {
-                instance ?: ViewLogFormatter(config).also { instance = it }
-            }
-        }
-    }
 
 
     /**
@@ -37,9 +25,11 @@ internal class ViewLogFormatter private constructor(private val config: ViewLogC
     override fun formatToStr(logType: LogType, tag: String, vararg content: Any): String {
         val contentStr = parseContent(*content)
 
-        val threadName = config.showThreadInfo.takeIf { it }?.let { Thread.currentThread().name }
+        val threadName =
+            InternalViewLogConfig.showThreadInfo.takeIf { it }?.let { Thread.currentThread().name }
         val traceInfo =
-            config.showStackTrace.takeIf { it }?.let { Throwable().firstStackTraceInfo() }
+            InternalViewLogConfig.showStackTrace.takeIf { it }
+                ?.let { Throwable().firstStackTraceInfo() }
 
 
         return buildLogStr(tag, contentStr, threadName, System.currentTimeMillis(), traceInfo)

@@ -1,7 +1,10 @@
 package com.yzq.logger
 
+import android.content.Intent
+import com.yzq.application.AppContext
 import com.yzq.logger.common.LogType
 import com.yzq.logger.core.AbsPrinter
+import com.yzq.logger.view.log_view.LogViewActivity
 import org.json.JSONArray
 import org.json.JSONObject
 import org.json.JSONTokener
@@ -181,5 +184,12 @@ object Logger {
         print(type, tag, message)
     }
 
+
+    fun showLogInfoPage() {
+        Intent(AppContext, LogViewActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            AppContext.startActivity(this)
+        }
+    }
 
 }

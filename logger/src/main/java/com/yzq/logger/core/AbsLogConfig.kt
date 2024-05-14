@@ -9,14 +9,14 @@ package com.yzq.logger.core
 abstract class AbsLogConfig(
 
     //是否启用
-    val enable: Boolean = false,
+    var enable: Boolean = false,
 
     //默认tag
-    val tag: String = "Logger",
+    var tag: String = "Logger",
 
     //是否显示堆栈信息
-    val showStackTrace: Boolean = true,
+    var showStackTrace: Boolean = true,
 
     //是否显示线程信息
-    val showThreadInfo: Boolean = true
+    var showThreadInfo: Boolean = true
 )

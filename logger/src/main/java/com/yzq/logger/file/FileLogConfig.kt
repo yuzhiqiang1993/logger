@@ -26,13 +26,13 @@ class FileLogConfig private constructor(builder: Builder) :
     val minLevel: LogType = builder.minLevel
 
     // 日志阻塞队列的最大容量
-    val logQueueCapacity: Int = builder.logQueueCapacity
+    val logCapacity: Int = builder.logCapacity
 
     // 主动触发日志写入的间隔时间，单位秒
     val writeLogInterval: Long = builder.writeLogInterval
 
     // 写入前存放在内存中的最大日志条数
-    val maxCacheSize: Int = builder.maxCacheSize
+    val memoryCacheSize: Int = builder.memoryCacheSize
 
 
     class Builder {
@@ -70,8 +70,8 @@ class FileLogConfig private constructor(builder: Builder) :
         var minLevel: LogType = LogType.VERBOSE
             private set
 
-        // 日志阻塞队列的最大容量
-        var logQueueCapacity: Int = FileLogConstant.logQueueCapacity
+        // 日志流的最大容量
+        var logCapacity: Int = FileLogConstant.logCapacity
             private set
 
         // 主动触发日志写入的间隔时间，单位秒
@@ -79,89 +79,86 @@ class FileLogConfig private constructor(builder: Builder) :
             private set
 
         // 写入前存放在内存中的最大日志条数
-        var maxCacheSize: Int = FileLogConstant.maxCacheSize
+        var memoryCacheSize: Int = FileLogConstant.memoryCacheSize
             private set
 
-        fun enable(enable: Boolean): Builder {
+        fun enable(enable: Boolean) = apply {
             this.enable = enable
-            return this
+
         }
 
-        fun tag(tag: String): Builder {
+        fun tag(tag: String) = apply {
             this.tag = tag
-            return this
+
         }
 
-        fun showStackTrace(showStackTrace: Boolean): Builder {
+        fun showStackTrace(showStackTrace: Boolean) = apply {
             this.showStackTrace = showStackTrace
-            return this
         }
 
-        fun showThreadInfo(showThreadInfo: Boolean): Builder {
+        fun showThreadInfo(showThreadInfo: Boolean) = apply {
             this.showThreadInfo = showThreadInfo
-            return this
+
         }
 
 
-        fun dirName(dirName: String): Builder {
+        fun dirName(dirName: String) = apply {
             this.dirName = dirName
-            return this
+
         }
 
-        fun storageDuration(storageDuration: Int): Builder {
+        fun storageDuration(storageDuration: Int) = apply {
             this.storageDuration = storageDuration
-            return this
+
         }
 
-        fun maxFileSize(maxFileSize: Int): Builder {
+        fun maxFileSize(maxFileSize: Int) = apply {
             this.maxFileSize = maxFileSize
-            return this
+
         }
 
-        fun filePrefix(filePrefix: String): Builder {
+        fun filePrefix(filePrefix: String) = apply {
             this.filePrefix = filePrefix
-            return this
+
         }
 
-        fun minLevel(minLevel: LogType): Builder {
+        fun minLevel(minLevel: LogType) = apply {
             this.minLevel = minLevel
-            return this
+
         }
 
-        fun logQueueCapacity(logQueueCapacity: Int): Builder {
-            this.logQueueCapacity = logQueueCapacity
-            return this
+        fun logCapacity(logCapacity: Int) = apply {
+            this.logCapacity = logCapacity
+
         }
 
-        fun writeLogInterval(writeLogInterval: Long): Builder {
+        fun writeLogInterval(writeLogInterval: Long) = apply {
             this.writeLogInterval = writeLogInterval
-            return this
+
         }
 
-        fun maxCacheSize(maxCacheSize: Int): Builder {
-            this.maxCacheSize = maxCacheSize
-            return this
+        fun memoryCacheSize(memoryCacheSize: Int) = apply {
+            this.memoryCacheSize = memoryCacheSize
         }
 
 
         fun build(): FileLogConfig {
             return FileLogConfig(this).apply {
 
-                if (logQueueCapacity <= FileLogConstant.minLogQueueCapacity) {
-                    throw IllegalArgumentException("logQueueCapacity must be greater than ${FileLogConstant.minLogQueueCapacity}")
+                if (logCapacity < FileLogConstant.minLogCapacity) {
+                    throw IllegalArgumentException("logQueueCapacity must be greater than ${FileLogConstant.minLogCapacity}")
                 }
                 if (writeLogInterval < FileLogConstant.minWriteLogInterval) {
                     throw IllegalArgumentException("writeLogInterval must be greater than ${FileLogConstant.minWriteLogInterval}")
                 }
 
-                if (maxCacheSize <= FileLogConstant.minCacheSize) {
+                if (memoryCacheSize < FileLogConstant.minCacheSize) {
                     throw IllegalArgumentException("maxCacheSize must be greater than ${FileLogConstant.minCacheSize}")
                 }
 
                 if (dirName.isEmpty()) {
                     throw IllegalArgumentException("dirName must not be empty")
                 }
-
 
             }
         }

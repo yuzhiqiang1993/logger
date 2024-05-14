@@ -9,7 +9,7 @@ import java.util.UUID
  * @author : yuzhiqiang
  */
 
-class ViewLogItem(
+internal class ViewLogItem(
     val id: String = UUID.randomUUID().toString(),
     val logType: LogType,
     val content: String

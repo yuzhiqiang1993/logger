@@ -6,7 +6,7 @@ import com.yzq.application.AppStorage
 import com.yzq.coroutine.interval.interval
 import com.yzq.coroutine.thread_pool.ThreadPoolManager
 import com.yzq.logger.core.println
-import com.yzq.logger.data.FileLogItem
+import com.yzq.logger.data.LogItem
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
@@ -23,27 +23,25 @@ import java.util.concurrent.locks.ReentrantLock
  * @author : yuzhiqiang
  */
 
-internal class FileLogWriter private constructor(
-    private val config: FileLogConfig
-) : AppStateListener {
+internal object FileLogWriter : AppStateListener {
 
-    init {
-        AppManager.addAppStateListener(this)
-    }
 
     //日志文件的存储目录,默认是/data/user/0/com.xxx.xxxx/files/.log/
     private var logFileDir = ""
 
 
     //用于存放阻塞队列过来的日志
-    private val logBufferList = mutableListOf<FileLogItem>()
+    private val logBufferList = mutableListOf<LogItem>()
 
 
     //最后一次写入的时间
     private var lastWriteTime = System.currentTimeMillis()
 
     //用于执行定时任务的定时器
-    private val interval = interval(config.writeLogInterval, initialDelay = config.writeLogInterval)
+    private val interval = interval(
+        InternalFileLogConfig.writeLogInterval,
+        initialDelay = InternalFileLogConfig.writeLogInterval
+    )
 
     //存放日志文件的列表
     private var existLogFileList = listLogDirFiles()
@@ -58,29 +56,10 @@ internal class FileLogWriter private constructor(
     private val updateFileLock = ReentrantLock(true)
 
 
-    companion object {
-
-        @Volatile
-        var instance: FileLogWriter? = null
-
-        fun getInstance(
-            config: FileLogConfig
-        ): FileLogWriter {
-            return instance ?: synchronized(this) {
-                instance ?: FileLogWriter(config).also {
-                    instance = it
-                    it.init()
-                }
-            }
-
-        }
-
-    }
-
-    private fun init() {
+    init {
 
         logFileDir =
-            "${AppStorage.Internal.filesPath}${File.separator}${config.dirName}${File.separator}"
+            "${AppStorage.Internal.filesPath}${File.separator}${InternalFileLogConfig.dirName}${File.separator}"
 
         //目录如果不存在，先创建
         val logFileDir = File(logFileDir)
@@ -93,18 +72,20 @@ internal class FileLogWriter private constructor(
 
         //启动一个定时任务，用于定期写入日志,避免出现日志条数不满足条件，导致日志不写入的情况
         interval.subscribe {
-            "定时任务开始执行:${config.writeLogInterval},次数:${it}".println()
+            "定时任务开始执行:${InternalFileLogConfig.writeLogInterval},次数:${it}".println()
             writeLog(true)
         }.start()
 
+        AppManager.addAppStateListener(this)
     }
+
 
     /**
      * 需要保证添加log的原子性
      * @param log LogItem?
      * @param forceFlush Boolean
      */
-    fun addLog(log: FileLogItem) {
+    fun addLog(log: LogItem) {
 
         lockBlock(logDataLock) {
             logBufferList.add(log)
@@ -116,8 +97,8 @@ internal class FileLogWriter private constructor(
 
     private fun writeLog(forceWrite: Boolean) {
 
-        if (!forceWrite && logBufferList.size < config.maxCacheSize) {
-            "非强制写入并且日志数量不足${config.maxCacheSize}条，不写入".println()
+        if (!forceWrite && logBufferList.size < InternalFileLogConfig.memoryCacheSize) {
+            "非强制写入并且日志数量不足${InternalFileLogConfig.memoryCacheSize}条，不写入".println()
             return
         }
 
@@ -131,7 +112,7 @@ internal class FileLogWriter private constructor(
                 return@lockBlock
             }
             //把logBufferList的数据存到一个list中
-            val tempLogList = mutableListOf<FileLogItem>()
+            val tempLogList = mutableListOf<LogItem>()
             tempLogList.addAll(logBufferList)
             "tmpLogList数量：${tempLogList.size}".println()
             logBufferList.clear()
@@ -143,7 +124,7 @@ internal class FileLogWriter private constructor(
 
     }
 
-    private fun flushLog(tempLogList: MutableList<FileLogItem>) {
+    private fun flushLog(tempLogList: MutableList<LogItem>) {
         if (tempLogList.size == 0) {
             "满足写入条件，但是日志数量为0，不写入".println()
             return
@@ -176,7 +157,7 @@ internal class FileLogWriter private constructor(
 
     }
 
-    private fun doFileWrite(file: File, logList: List<FileLogItem>): Callable<Boolean> {
+    private fun doFileWrite(file: File, logList: List<LogItem>): Callable<Boolean> {
 
         return Callable {
             runCatching {
@@ -187,7 +168,7 @@ internal class FileLogWriter private constructor(
                 val sb = StringBuilder()
                 logList.forEach { logItem ->
                     sb.append(
-                        FileLogFormatter.instance.formatToStr(logItem)
+                        FileLogFormatter.formatToStr(logItem)
                     )
                 }
                 //将内容追加到文件中
@@ -211,14 +192,15 @@ internal class FileLogWriter private constructor(
      */
 
     private fun clearExpiredLogFiles() {
-        "clearExpiredLogFiles storageDuration:${config.storageDuration}".println()
-        if (config.storageDuration <= 0) {
+        "clearExpiredLogFiles storageDuration:${InternalFileLogConfig.storageDuration}".println()
+        if (InternalFileLogConfig.storageDuration <= 0) {
             return
         }
         updateExistLogFileList()
         val hasDelete = AtomicBoolean(false)
         //计算过期时间点
-        val expiredTime = System.currentTimeMillis() - config.storageDuration * 60 * 60 * 1000
+        val expiredTime =
+            System.currentTimeMillis() - InternalFileLogConfig.storageDuration * 60 * 60 * 1000
         "过期时间点:${
             SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(
                 expiredTime
@@ -265,7 +247,7 @@ internal class FileLogWriter private constructor(
      * @param filePrefix String
      * @return File?
      */
-    private fun getOperateFile(log: FileLogItem): File {
+    private fun getOperateFile(log: LogItem): File {
 
 //        "getOperateFile:${log.timeMillis}".println()
         //当前年-月-日-时
@@ -274,8 +256,8 @@ internal class FileLogWriter private constructor(
         ).format(log.timeMillis)
 
         //先确定文件名，规则为：文件名前缀-yyyy-MM-dd-HH-index.txt，例如：2024-01-14-14-1.txt
-        val filePrefix = if (config.filePrefix.isNotEmpty()) {
-            "${config.filePrefix}-${logTime}"
+        val filePrefix = if (InternalFileLogConfig.filePrefix.isNotEmpty()) {
+            "${InternalFileLogConfig.filePrefix}-${logTime}"
         } else {
             logTime
         }
@@ -305,7 +287,7 @@ internal class FileLogWriter private constructor(
             updateExistLogFileList()
         }
         //如果文件大小未超过限制，则直接返回
-        if (operateFile.length() <= config.maxFileSize) {
+        if (operateFile.length() <= InternalFileLogConfig.maxFileSize) {
             return operateFile
         }
 
@@ -344,8 +326,6 @@ internal class FileLogWriter private constructor(
         try {
 
             if (lock.tryLock(timeoutSeconds, TimeUnit.SECONDS)) {
-//                lock.info().println()
-//                "锁获取成功".println()
                 block()
             } else {
                 "获取锁超时失败".println()
@@ -353,9 +333,7 @@ internal class FileLogWriter private constructor(
         } finally {
             if (lock.isHeldByCurrentThread) {
                 lock.unlock()
-//                "释放锁成功".println()
             }
-//            lock.info().println()
         }
 
     }
