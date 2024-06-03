@@ -324,7 +324,6 @@ internal object FileLogWriter : AppStateListener {
 
     private fun lockBlock(lock: ReentrantLock, timeoutSeconds: Long = 10, block: () -> Unit) {
         try {
-
             if (lock.tryLock(timeoutSeconds, TimeUnit.SECONDS)) {
                 block()
             } else {

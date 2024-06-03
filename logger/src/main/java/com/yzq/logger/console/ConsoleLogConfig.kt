@@ -19,7 +19,7 @@ class ConsoleLogConfig private constructor(builder: Builder) : AbsLogConfig(
         var enable: Boolean = true
             private set
 
-        var tag: String = "ViewLog"
+        var tag: String = "ConsoleLog"
             private set
 
         var showStackTrace: Boolean = true
