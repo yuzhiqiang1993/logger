@@ -1,13 +1,11 @@
 package com.yzq.logger.core
 
 
-private val TAG = "LoggerPrintln"
-
 @Volatile
-var loggerDebug = false
+internal var loggerDebug = false
 
-fun String.println() {
+internal fun String.println() {
     if (loggerDebug) {
-        println("$TAG: $this,thread:${Thread.currentThread().name}")
+        println("$this,thread:${Thread.currentThread().name}")
     }
 }

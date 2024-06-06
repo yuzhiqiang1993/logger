@@ -21,12 +21,10 @@ internal fun Throwable.firstStackTraceInfo(): String {
     var traceInfo = ""
     /*找出第一个符合条件的堆栈信息*/
     this.stackTrace.firstOrNull {
-//        println("it.className = ${it.className}")
         ignoreClassNames.none { ignoreClassName ->
             it.className.startsWith(ignoreClassName)
         }
     }?.run {
-//        println("获取堆栈信息：$this")
         traceInfo = "${className}.$methodName($fileName:$lineNumber)"
     }
 

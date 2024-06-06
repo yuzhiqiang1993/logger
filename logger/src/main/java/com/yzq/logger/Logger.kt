@@ -4,6 +4,7 @@ import android.content.Intent
 import com.yzq.application.AppContext
 import com.yzq.logger.common.LogType
 import com.yzq.logger.core.AbsPrinter
+import com.yzq.logger.core.loggerDebug
 import com.yzq.logger.view.log_view.LogViewActivity
 import org.json.JSONArray
 import org.json.JSONObject
@@ -19,6 +20,11 @@ import java.util.Collections
 object Logger {
 
     private val printerList = Collections.synchronizedList(arrayListOf<AbsPrinter>())
+
+
+    fun debug(debug: Boolean) {
+        loggerDebug = debug
+    }
 
     @JvmStatic
     fun addPrinter(printer: AbsPrinter): Logger {

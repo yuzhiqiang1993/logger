@@ -6,7 +6,6 @@ import com.yzq.coroutine.interval.interval
 import com.yzq.logger.Logger
 import com.yzq.logger.console.ConsoleLogConfig
 import com.yzq.logger.console.ConsoleLogPrinter
-import com.yzq.logger.core.loggerDebug
 import com.yzq.logger.file.FileLogConfig
 import com.yzq.logger.file.FileLogPrinter
 import com.yzq.logger.view.core.ViewLogConfig
@@ -18,24 +17,15 @@ class App : Application() {
         super.onCreate()
 
         AppManager.init(this, BuildConfig.DEBUG)
-        loggerDebug = true
 
 
         val consoleLogPrinter = ConsoleLogPrinter.getInstance(
-            ConsoleLogConfig.Builder().enable(true)
-                .showStackTrace(true)
-                .showThreadInfo(true)
-                .lineLength(1000)
-                .showBorder(true)
-                .tag("customeTag")
-                .build()
+            ConsoleLogConfig.Builder().enable(true).showStackTrace(true).showThreadInfo(true)
+                .lineLength(1000).showBorder(true).tag("customeTag").build()
         )
         val fileLogPrinter = FileLogPrinter.getInstance(
-            FileLogConfig.Builder().enable(true)
-                .writeLogInterval(10)
-                .logCapacity(100)
-                .memoryCacheSize(100)
-                .build()
+            FileLogConfig.Builder().enable(true).writeLogInterval(10).logCapacity(100)
+                .memoryCacheSize(100).build()
         )
 
 
@@ -45,10 +35,8 @@ class App : Application() {
         )
 
 
-        Logger.addPrinter(consoleLogPrinter)
-            .addPrinter(fileLogPrinter)
-            .addPrinter(viewLogPrinter)
-
+        Logger.addPrinter(consoleLogPrinter).addPrinter(fileLogPrinter).addPrinter(viewLogPrinter)
+            .debug(true)
 
 
         Logger.i("Logger", "开始打印不同等级的日志")
