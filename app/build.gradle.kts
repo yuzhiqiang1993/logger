@@ -1,14 +1,14 @@
 plugins {
     alias(libs.plugins.xeonyu.application)
-    alias(libs.plugins.xeonyu.dependencyManager)
+//    alias(libs.plugins.xeonyu.dependencyManager)
 }
 
-dependencyManager {
-    //依赖分析
-    analysis {
-        enable = true
-    }
-}
+//dependencyManager {
+//    //依赖分析
+//    analysis {
+//        enable = true
+//    }
+//}
 
 
 android {
@@ -21,20 +21,32 @@ android {
 
     }
 
+    signingConfigs {
+
+        getByName("debug") {
+            storeFile = file("ketstore")
+            storePassword = "123456"
+            keyAlias = "logger"
+            keyPassword = "123456"
+        }
+    }
+
+
     buildTypes {
 
         debug {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("debug")
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
         }
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            signingConfig = signingConfigs.getByName("debug")
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
         }
     }

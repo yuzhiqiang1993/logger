@@ -16,7 +16,10 @@ class ViewLogPrinter private constructor() : AbsPrinter() {
 
 
     private val logVm =
-        ViewModelProvider(ViewLogVMStoreOwner.instance).get(ViewLogVm::class.java)
+        ViewModelProvider(
+            ViewLogVMStoreOwner.instance,
+            ViewLogVm.provideFactory()
+        ).get(ViewLogVm::class.java)
 
 
     companion object {

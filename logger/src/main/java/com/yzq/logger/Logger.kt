@@ -22,8 +22,9 @@ object Logger {
     private val printerList = Collections.synchronizedList(arrayListOf<AbsPrinter>())
 
 
-    fun debug(debug: Boolean) {
+    fun debug(debug: Boolean): Logger {
         loggerDebug = debug
+        return this
     }
 
     @JvmStatic

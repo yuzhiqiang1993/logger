@@ -35,7 +35,8 @@ class LogViewActivity : AppCompatActivity() {
 
 
     private val logVm = ViewModelProvider(
-        ViewLogVMStoreOwner.instance
+        ViewLogVMStoreOwner.instance,
+        ViewLogVm.provideFactory()
     ).get(ViewLogVm::class.java)
 
     private val logAdapter = LogAdapter()
