@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
  * @author : yuzhiqiang
  */
 
+@Suppress("UNCHECKED_CAST")
 internal class ViewLogVm private constructor() : ViewModel() {
 
 
