@@ -19,10 +19,10 @@ dependencies {
     implementation(libs.androidx.activity.ktx.stable)
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.constraintlayout.stable)
-    implementation(libs.xeonyu.binding)
+    implementation(libs.androidx.cardview)
+
     api(libs.xeonyu.application)
     implementation(libs.xeonyu.coroutine)
-    implementation(libs.androidx.cardview)
     implementation(libs.xeonyu.binding)
 
 }
