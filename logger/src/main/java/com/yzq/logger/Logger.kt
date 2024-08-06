@@ -171,24 +171,46 @@ object Logger {
     @JvmStatic
     fun json(
         json: String,
-        tag: String? = null,
         type: LogType = LogType.INFO,
     ) {
-        val tokener = JSONTokener(json)
+        formatJson(json)?.let {
+            print(type, null, it)
+        }
+    }
+
+    /**
+     * 打印json
+     * @param tag String
+     * @param json String
+     * @param type Type
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun jsont(
+        tag: String,
+        json: String,
+        type: LogType = LogType.INFO,
+    ) {
+        formatJson(json)?.let {
+            print(type, tag, it)
+        }
+    }
+
+    private fun formatJson(json: String): String? {
+        val tokenizer = JSONTokener(json)
 
         val obj = runCatching {
-            tokener.nextValue()//解析字符串返回根对象
+            tokenizer.nextValue()//解析字符串返回根对象
         }.onFailure {
             it.printStackTrace()
         }.getOrDefault("Logger：Json解析异常，无法打印出实际内容")
 
-        val message = when (obj) {
+        val formatJson = when (obj) {
             is JSONObject -> obj.toString(2) //转成格式化的json
             is JSONArray -> obj.toString(2) //转成格式化的json
             else -> obj.toString()
         }
-
-        print(type, tag, message)
+        return formatJson
     }
 
 
