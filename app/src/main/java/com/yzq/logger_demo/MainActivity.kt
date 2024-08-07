@@ -3,7 +3,6 @@ package com.yzq.logger_demo
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.yzq.logger.Logger
-import com.yzq.logger.common.LogType
 import com.yzq.logger_demo.data.User
 import com.yzq.logger_demo.databinding.ActivityMainBinding
 import org.json.JSONObject
@@ -47,11 +46,9 @@ class MainActivity : AppCompatActivity() {
 
 
         /*打印json*/
-        Logger.json(
-            JSONObject().put("name", "yuzhiqiang").put("age", 18).toString(),
-            "onCreate",
-            LogType.ERROR
-        )
+        Logger.json(JSONObject().put("name", "yuzhiqiang").put("age", 18).toString())
+
+        Logger.jsont("json", JSONObject().put("name", "yuzhiqiang").put("age", 18).toString())
 
         viewbinding.btnSkip.setOnClickListener {
             startActivity(JavaActivity.createIntent(this))
