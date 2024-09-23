@@ -14,7 +14,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.yzq.binding.viewbind
 import com.yzq.coroutine.flow.debounce
-import com.yzq.coroutine.safety_coroutine.launchSafety
 import com.yzq.logger.data.LogTypeItem
 import com.yzq.logger.databinding.ActivityLogViewBinding
 import com.yzq.logger.databinding.LayoutPopuWindowBinding
@@ -22,6 +21,7 @@ import com.yzq.logger.view.popupwindow.LogTypeAdapter
 import com.yzq.logger.view.popupwindow.LogTypeClickListener
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 
 /**
@@ -59,7 +59,7 @@ class LogViewActivity : AppCompatActivity() {
     }
 
     private fun observeData() {
-        lifecycleScope.launchSafety {
+        lifecycleScope.launch {
             logVm.logsSharedFlow?.collect {
                 logAdapter.addData(it)
             }

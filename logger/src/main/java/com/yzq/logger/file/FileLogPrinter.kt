@@ -2,16 +2,16 @@ package com.yzq.logger.file
 
 import com.yzq.application.AppManager
 import com.yzq.application.AppStateListener
-import com.yzq.coroutine.safety_coroutine.launchSafety
 import com.yzq.logger.common.LogType
 import com.yzq.logger.common.firstStackTraceInfo
 import com.yzq.logger.core.AbsPrinter
 import com.yzq.logger.data.LogItem
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 import java.lang.Thread.currentThread
 
 
@@ -24,8 +24,6 @@ class FileLogPrinter private constructor() : AbsPrinter(), AppStateListener {
     //日志流
     private var logFlow: MutableSharedFlow<LogItem>? = null
 
-
-    private val logScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     init {
         AppManager.addAppStateListener(this)
@@ -58,6 +56,7 @@ class FileLogPrinter private constructor() : AbsPrinter(), AppStateListener {
     }
 
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun print(logType: LogType, tag: String?, vararg content: Any) {
         if (!InternalFileLogConfig.enable || logFlow == null) {
             return
@@ -65,7 +64,7 @@ class FileLogPrinter private constructor() : AbsPrinter(), AppStateListener {
 
         if (logType.level >= InternalFileLogConfig.minLevel.level) {
             //将日志加入到阻塞队列中，等待写入，如果队列满了，则丢弃，不会阻塞，不会抛出异常
-            logScope.launchSafety {
+            GlobalScope.launch(Dispatchers.IO) {
                 logFlow?.tryEmit(LogItem(
                     tag ?: InternalFileLogConfig.tag,
                     logType,
@@ -89,7 +88,7 @@ class FileLogPrinter private constructor() : AbsPrinter(), AppStateListener {
             return
         }
 
-        logScope.launchSafety {
+        GlobalScope.launch(Dispatchers.IO) {
             logFlow?.collect {
                 FileLogWriter.addLog(it)
             }

@@ -3,7 +3,6 @@ package com.yzq.logger.view.log_view
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.yzq.coroutine.safety_coroutine.launchSafety
 import com.yzq.logger.common.LogType
 import com.yzq.logger.data.ViewLogItem
 import com.yzq.logger.view.core.InternalViewLogConfig
@@ -11,6 +10,7 @@ import com.yzq.logger.view.core.ViewLogFormatter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 
 
 /**
@@ -51,7 +51,7 @@ internal class ViewLogVm private constructor() : ViewModel() {
             )
         }
 
-        viewModelScope.launchSafety(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO) {
             val logStr = ViewLogFormatter.formatToStr(logType, tag, *content)
             logsSharedFlow?.tryEmit(ViewLogItem(logType = logType, content = logStr))
         }
