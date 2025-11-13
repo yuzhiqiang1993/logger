@@ -21,15 +21,14 @@ class MainActivity : AppCompatActivity() {
 
 
         /*打印*/
-        Logger.v("onCreate")
-        Logger.d("onCreate")
+        Logger.v("MainActivity", "onCreate")
+        Logger.d("MainActivity", "onCreate")
         /*子线程打印*/
         thread {
-            Logger.i("onCreate")
+            Logger.i("MainActivity", "onCreate")
         }
-        Logger.w("onCreate", "111", 23132, arrayListOf("21312", 21131), mapOf(1 to 1, 3 to 3))
-        Logger.e("onCreate", 111, true, Exception("test error"))
-        Logger.et("onCreate", "异常信息")
+        Logger.w("MainActivity", "111", 23132, arrayListOf("21312", 21131), mapOf(1 to 1, 3 to 3))
+        Logger.e("MainActivity", 111, true, Exception("test error"))
 
         val user = User("yuzhiqiang", 18)
 
@@ -41,24 +40,22 @@ class MainActivity : AppCompatActivity() {
         }
         val userListJson = MoshiUtils.toJson(userList, "  ")
 
-        Logger.i(userListJson)
+        Logger.i("MainActivity", userListJson)
 //        Log.i("userList", userListJson)
 
 
         /*打印json*/
-        Logger.json(JSONObject().put("name", "yuzhiqiang").put("age", 18).toString())
-
-        Logger.jsont("json", JSONObject().put("name", "yuzhiqiang").put("age", 18).toString())
+        Logger.json("MainActivity", JSONObject().put("name", "yuzhiqiang").put("age", 18).toString())
 
         viewbinding.btnSkip.setOnClickListener {
             startActivity(JavaActivity.createIntent(this))
         }
 
         viewbinding.btnPrint.setOnClickListener {
-            Logger.i("点击了打印按钮")
+            Logger.i("MainActivity", "点击了打印按钮")
 
             for (i in 0..100) {
-                Logger.i("循环打印$i")
+                Logger.i("MainActivity", "循环打印$i")
             }
 
         }

@@ -57,7 +57,7 @@ class FileLogPrinter private constructor() : AbsPrinter(), AppStateListener {
 
 
     @OptIn(DelicateCoroutinesApi::class)
-    override fun print(logType: LogType, tag: String?, vararg content: Any) {
+    override fun print(logType: LogType, tag: String, vararg content: Any) {
         if (!InternalFileLogConfig.enable || logFlow == null) {
             return
         }
@@ -66,7 +66,7 @@ class FileLogPrinter private constructor() : AbsPrinter(), AppStateListener {
             //将日志加入到阻塞队列中，等待写入，如果队列满了，则丢弃，不会阻塞，不会抛出异常
             GlobalScope.launch(Dispatchers.IO) {
                 logFlow?.tryEmit(LogItem(
-                    tag ?: InternalFileLogConfig.tag,
+                    if (tag.isEmpty()) InternalFileLogConfig.tag else tag,
                     logType,
                     System.currentTimeMillis(),
                     content = content,

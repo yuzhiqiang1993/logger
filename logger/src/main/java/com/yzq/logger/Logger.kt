@@ -50,55 +50,24 @@ object Logger {
 
 
     @JvmStatic
-    fun v(vararg content: Any) {
-        print(LogType.VERBOSE, null, *content)
-    }
-
-
-    @JvmStatic
-    fun vt(
-        tag: String,
-        vararg content: Any,
-    ) {
+    fun v(tag: String, vararg content: Any) {
         print(LogType.VERBOSE, tag, *content)
     }
 
-    @JvmStatic
-    fun i(vararg content: Any) {
-        print(LogType.INFO, null, *content)
-    }
 
     @JvmStatic
-    fun it(
-        tag: String,
-        vararg content: Any,
-    ) {
+    fun i(tag: String, vararg content: Any) {
         print(LogType.INFO, tag, *content)
     }
 
-    @JvmStatic
-    fun d(vararg content: Any) {
-        print(LogType.DEBUG, null, *content)
-    }
 
     @JvmStatic
-    fun dt(
-        tag: String,
-        vararg content: Any,
-    ) {
+    fun d(tag: String, vararg content: Any) {
         print(LogType.DEBUG, tag, *content)
     }
 
-
     @JvmStatic
     fun w(
-        vararg content: Any,
-    ) {
-        print(LogType.WARN, null, *content)
-    }
-
-    @JvmStatic
-    fun wt(
         tag: String,
         vararg content: Any,
     ) {
@@ -107,38 +76,21 @@ object Logger {
 
 
     @JvmStatic
-    fun e(vararg content: Any) {
-        print(LogType.ERROR, null, *content)
-    }
-
-    @JvmStatic
-    fun et(
-        tag: String,
-        vararg content: Any,
-    ) {
+    fun e(tag: String, vararg content: Any) {
         print(LogType.ERROR, tag, *content)
     }
 
 
     @JvmStatic
     fun wtf(
-        vararg content: Any,
-    ) {
-        print(LogType.WTF, null, *content)
-    }
-
-    @JvmStatic
-    fun wtft(
         tag: String,
         vararg content: Any,
     ) {
-        print(LogType.WTF, tag, content)
+        print(LogType.WTF, tag, *content)
     }
-
 
     /**
      * 输出日志
-     * 如果[msg]和[tr]为空或者[tag]为空将不会输出日志, 拦截器
      *
      * @param logType 日志等级
      * @param msg 日志信息
@@ -147,7 +99,7 @@ object Logger {
      */
     private fun print(
         logType: LogType,
-        tag: String? = null,
+        tag: String,
         vararg content: Any,
     ) {
 
@@ -170,23 +122,6 @@ object Logger {
     @JvmOverloads
     @JvmStatic
     fun json(
-        json: String,
-        type: LogType = LogType.INFO,
-    ) {
-        formatJson(json)?.let {
-            print(type, null, it)
-        }
-    }
-
-    /**
-     * 打印json
-     * @param tag String
-     * @param json String
-     * @param type Type
-     */
-    @JvmStatic
-    @JvmOverloads
-    fun jsont(
         tag: String,
         json: String,
         type: LogType = LogType.INFO,
@@ -195,6 +130,7 @@ object Logger {
             print(type, tag, it)
         }
     }
+
 
     private fun formatJson(json: String): String? {
         val tokenizer = JSONTokener(json)

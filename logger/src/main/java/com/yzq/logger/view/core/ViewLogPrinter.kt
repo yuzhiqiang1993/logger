@@ -36,9 +36,9 @@ class ViewLogPrinter private constructor() : AbsPrinter() {
     }
 
 
-    override fun print(logType: LogType, tag: String?, vararg content: Any) {
+    override fun print(logType: LogType, tag: String, vararg content: Any) {
         if (!InternalViewLogConfig.enable) return
-        logVm.emitLog(logType, tag ?: InternalViewLogConfig.tag, *content)
+        logVm.emitLog(logType, if (tag.isEmpty()) InternalViewLogConfig.tag else tag, *content)
     }
 
 

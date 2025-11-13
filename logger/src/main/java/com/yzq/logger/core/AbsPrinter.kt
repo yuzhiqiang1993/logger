@@ -17,7 +17,7 @@ abstract class AbsPrinter {
      */
     abstract fun print(
         logType: LogType,
-        tag: String?,
+        tag: String,
         vararg content: Any,
     )
 }

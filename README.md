@@ -64,22 +64,22 @@ Logger.addPrinter(consoleLogPrinter)
 
 
 Logger.i("Logger", "开始打印不同等级的日志")
-Logger.vt("customeTag", "asdsa", 112)
-Logger.it("customeTag", "asdsa", 112)
-Logger.dt("customeTag", "asdsa", 112)
-Logger.et("customeTag", "asdsa", 112)
-Logger.wt("customeTag", "asdsa", 112)
-Logger.wtft("customeTag", "asdsa", 112)
+Logger.v("customeTag", "asdsa", 112)
+Logger.i("customeTag", "asdsa", 112)
+Logger.d("customeTag", "asdsa", 112)
+Logger.e("customeTag", "asdsa", 112)
+Logger.w("customeTag", "asdsa", 112)
+Logger.wtf("customeTag", "asdsa", 112)
 
 
 /*子线程打印*/
 thread {
-    Logger.i("onCreate")
+    Logger.i("MainActivity", "onCreate")
 }
-Logger.w("onCreate")
-Logger.e("onCreate", tr = Exception("data error"))
+Logger.w("MainActivity", "警告信息")
+Logger.e("MainActivity", Exception("data error"))
 /*打印json*/
-Logger.json(JSONObject().put("name", "yuzhiqiang").put("age", 18).toString())
+Logger.json("MainActivity", JSONObject().put("name", "yuzhiqiang").put("age", 18).toString())
 ```
 
 控制台显示如下：

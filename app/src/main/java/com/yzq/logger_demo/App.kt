@@ -40,19 +40,19 @@ class App : Application() {
 
 
         Logger.i("Logger", "开始打印不同等级的日志")
-        Logger.vt("customeTag", "asdsa", 112)
-        Logger.it("customeTag", "asdsa", 112)
-        Logger.dt("customeTag", "asdsa", 112)
-        Logger.et("customeTag", "asdsa", 112)
-        Logger.wt("customeTag", "asdsa", 112)
-        Logger.wtft("customeTag", "asdsa", 112)
+        Logger.v("customeTag", "asdsa", 112)
+        Logger.i("customeTag", "asdsa", 112)
+        Logger.d("customeTag", "asdsa", 112)
+        Logger.e("customeTag", "asdsa", 112)
+        Logger.w("customeTag", "asdsa", 112)
+        Logger.wtf("customeTag", "asdsa", 112)
 
 
         interval().subscribe {
             if ((it % 2).toInt() == 0) {
-                Logger.it("interval", "interval:${it}")
+                Logger.i("interval", "interval:${it}")
             } else {
-                Logger.et("interval", "interval:${it}")
+                Logger.e("interval", "interval:${it}")
 
             }
         }.start()

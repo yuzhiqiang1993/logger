@@ -32,11 +32,11 @@ class ConsoleLogPrinter private constructor() : AbsPrinter() {
 
 
     override fun print(
-        logType: LogType, tag: String?, vararg content: Any
+        logType: LogType, tag: String, vararg content: Any
     ) {
 
         if (!InternalConsoleConfig.enable) return
-        val finalTag = tag ?: InternalConsoleConfig.tag
+        val finalTag = if (tag.isEmpty()) InternalConsoleConfig.tag else tag
         //格式化后的内容
         val logStr = ConsoleLogFormatter.formatToStr(logType, finalTag, *content)
 

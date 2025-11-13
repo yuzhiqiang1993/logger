@@ -23,15 +23,15 @@ public class JavaActivity extends AppCompatActivity {
     }
 
     private static void testLog() {
-        Logger.it(TAG, "JavaActivity testLog");
-        Logger.e("JavaActivity testLog");
+        Logger.i(TAG, "JavaActivity testLog");
+        Logger.e(TAG, "JavaActivity testLog");
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_java);
-        Logger.i("JavaActivity onCreate", "1111");
-        Logger.it(TAG, "JavaActivity onCreate", "2222");
+        Logger.i(TAG, "JavaActivity onCreate", "1111");
+        Logger.i(TAG, "JavaActivity onCreate", "2222");
     }
 }

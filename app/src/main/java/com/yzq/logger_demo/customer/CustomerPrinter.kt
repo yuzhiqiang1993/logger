@@ -10,8 +10,8 @@ import com.yzq.logger.core.AbsPrinter
  */
 class CustomerPrinter : AbsPrinter() {
 
-    override fun print(logType: LogType, tag: String?, vararg content: Any) {
-        val finalTag = tag ?: CustomerConfig.tag
+    override fun print(logType: LogType, tag: String, vararg content: Any) {
+        val finalTag = if (tag.isEmpty()) CustomerConfig.tag else tag
 
         val formatToStr = CustomerFormater.formatToStr(logType, finalTag, *content)
         println("自定义的打印器打印的内容：${formatToStr}")

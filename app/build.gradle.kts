@@ -21,22 +21,13 @@ android {
 
     }
 
-    signingConfigs {
 
-        getByName("debug") {
-            storeFile = file("ketstore")
-            storePassword = "123456"
-            keyAlias = "logger"
-            keyPassword = "123456"
-        }
-    }
 
 
     buildTypes {
 
         debug {
             isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("debug")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
@@ -44,7 +35,6 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
-            signingConfig = signingConfigs.getByName("debug")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
