@@ -1,80 +1,260 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:orientation="vertical"
-    android:padding="6dp"
+    android:background="@color/log_view_background"
     tools:context=".view.log_view.LogViewActivity">
 
+    <!-- 顶部搜索栏 -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/search_card"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="2dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <androidx.appcompat.widget.AppCompatEditText
-        android:id="@+id/et_search"
-        android:layout_width="match_parent"
-        android:layout_height="46dp"
-        android:gravity="center_vertical"
-        android:hint="关键字搜索"
-        android:paddingStart="4dp"
-        android:textSize="14sp" />
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="12dp">
 
+            <ImageView
+                android:id="@+id/iv_search_icon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_search"
+                android:tint="@color/log_view_icon_tint" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/et_search"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:background="@android:color/transparent"
+                android:gravity="center_vertical"
+                android:hint="搜索日志内容、TAG或线程名..."
+                android:textColor="@color/log_view_text_primary"
+                android:textColorHint="@color/log_view_text_hint"
+                android:textSize="14sp"
+                android:imeOptions="actionSearch"
+                android:inputType="text" />
+
+            <ImageView
+                android:id="@+id/iv_clear_search"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_clear"
+                android:tint="@color/log_view_icon_tint"
+                android:visibility="gone"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="2dp" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- 功能按钮栏 -->
     <androidx.appcompat.widget.LinearLayoutCompat
-        android:layout_width="match_parent"
-        android:layout_height="46dp"
-        android:orientation="horizontal">
+        android:id="@+id/button_bar"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/log_view_button_bar_bg"
+        android:elevation="1dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/search_card">
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tv_type"
+        <!-- 日志级别筛选 -->
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/layout_log_type"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
             android:gravity="center"
-            android:text="Verbose"
-            android:textColor="@android:color/black" />
+            android:orientation="horizontal"
+            android:paddingHorizontal="8dp">
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tv_clear"
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_filter"
+                android:tint="@color/log_view_icon_tint" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="全部"
+                android:textColor="@color/log_view_text_primary"
+                android:textSize="12sp"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginStart="2dp"
+                android:src="@drawable/ic_arrow_down"
+                android:tint="@color/log_view_icon_tint" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginVertical="12dp"
+            android:background="@color/log_view_divider" />
+
+        <!-- 清空日志 -->
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/layout_clear"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
             android:gravity="center"
-            android:text="清空日志"
-            android:textColor="@android:color/black" />
+            android:orientation="horizontal">
 
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_delete"
+                android:tint="@color/log_view_icon_tint" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tv_top"
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="清空"
+                android:textColor="@color/log_view_text_primary"
+                android:textSize="12sp" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginVertical="12dp"
+            android:background="@color/log_view_divider" />
+
+        <!-- 回到顶部 -->
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/layout_top"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
             android:gravity="center"
-            android:text="回到顶部"
-            android:textColor="@android:color/black" />
+            android:orientation="horizontal">
 
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_upload"
+                android:tint="@color/log_view_icon_tint" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tv_bottom"
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_top"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="顶部"
+                android:textColor="@color/log_view_text_primary"
+                android:textSize="12sp" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginVertical="12dp"
+            android:background="@color/log_view_divider" />
+
+        <!-- 回到底部 -->
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/layout_bottom"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
             android:gravity="center"
-            android:text="回到底部"
-            android:textColor="@android:color/black" />
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_download"
+                android:tint="@color/log_view_icon_tint" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_bottom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="底部"
+                android:textColor="@color/log_view_text_primary"
+                android:textSize="12sp" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/darker_gray"
-        android:visibility="gone" />
+    <!-- 日志计数器 -->
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_log_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="共 0 条日志"
+        android:textColor="@color/log_view_text_secondary"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/button_bar" />
 
-
+    <!-- 日志列表 -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/log_recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="8dp"
+        android:clipToPadding="false"
+        android:paddingBottom="8dp"
+        android:scrollbars="vertical"
+        android:scrollbarThumbVertical="@color/log_view_scrollbar_thumb"
+        android:fadeScrollbars="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_log_count" />
 
+    <!-- 浮动操作按钮：自动滚动 -->
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/fab_auto_scroll"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_play"
+        android:tint="@android:color/white"
+        android:background="@drawable/fab_background"
+        android:elevation="6dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-</androidx.appcompat.widget.LinearLayoutCompat>
+</androidx.constraintlayout.widget.ConstraintLayout>

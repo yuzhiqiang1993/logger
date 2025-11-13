@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         viewbinding.btnLogView.setOnClickListener {
-//            val intent = Intent(this, LogViewActivity::class.java)
+//            val intent = Intent(this, LogViewActivityOptimized::class.java)
 //            startActivity(intent)
 
             Logger.showLogInfoPage()
