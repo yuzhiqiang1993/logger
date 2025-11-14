@@ -50,7 +50,7 @@ dependencies {
     implementation(libs.moshiKotlin)
     implementation(libs.xeonyu.application)
     implementation(libs.xeonyu.coroutine)
-//    implementation(libs.xeonyu.logger)
+  //    implementation(libs.xeonyu.logger)
     implementation(project(":logger"))
 
 }

@@ -15,7 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.yzq.binding.viewbind
+import com.yzq.binding.viewBinding
 import com.yzq.coroutine.flow.debounce
 import com.yzq.logger.R
 import com.yzq.logger.data.LogTypeItem
@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
  */
 class LogViewActivity : AppCompatActivity() {
 
-    private val binding by viewbind(ActivityLogViewBinding::inflate)
+    private val binding by viewBinding(ActivityLogViewBinding::inflate)
     private val logVm = ViewModelProvider(
         ViewLogVMStoreOwner.instance,
         ViewLogVm.provideFactory()
