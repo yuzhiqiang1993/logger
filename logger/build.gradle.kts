@@ -7,8 +7,15 @@ plugins {
 mavenPublishing {
     // 发布到 Maven Central
     publishToMavenCentral()
-    // 显式启用签名
-    signAllPublications()
+
+    // 只有非 SNAPSHOT 版本才需要签名
+    // SNAPSHOT 版本发布到 snapshots 仓库，不需要 GPG 签名
+    val versionName = project.findProperty("VERSION_NAME")?.toString() ?: ""
+    val isSnapshot = versionName.endsWith("SNAPSHOT", ignoreCase = true)
+
+    if (!isSnapshot) {
+        signAllPublications()
+    }
 }
 
 android {
@@ -32,4 +39,3 @@ dependencies {
     implementation(libs.xeonyu.coroutine)
     implementation(libs.xeonyu.binding)
 }
-
