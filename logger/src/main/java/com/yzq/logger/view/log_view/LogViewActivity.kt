@@ -21,13 +21,13 @@ import com.yzq.logger.R
 import com.yzq.logger.data.LogTypeItem
 import com.yzq.logger.databinding.ActivityLogViewBinding
 import com.yzq.logger.databinding.LayoutPopuWindowBinding
+import com.yzq.logger.databinding.LayoutTagFilterPopupBinding
 import com.yzq.logger.view.popupwindow.LogTypeAdapter
 import com.yzq.logger.view.popupwindow.LogTypeClickListener
-import kotlinx.coroutines.Job
+import com.yzq.logger.view.popupwindow.TagFilterAdapter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 /**
@@ -45,12 +45,13 @@ class LogViewActivity : AppCompatActivity() {
 
     // UI 组件
     private var logTypePopupWindow: PopupWindow? = null
-    private var autoScrollJob: Job? = null
-    private var isAutoScrollEnabled = false
+    private var tagFilterPopupWindow: PopupWindow? = null
+    private lateinit var tagFilterAdapter: TagFilterAdapter
+    private val isAutoScrollEnabled = true
+    private var selectedTags: Set<String> = emptySet()
 
     // 状态变量
     private var isAtBottom = true
-    private var lastVisibleItemPosition = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,9 +72,9 @@ class LogViewActivity : AppCompatActivity() {
 
     private fun initializeViews() {
         initPopupWindow()
+        initTagFilterPopup()
         setupRecyclerView()
         setupSearchView()
-        updateButtonStates()
     }
 
     private fun setupRecyclerView() {
@@ -125,33 +126,27 @@ class LogViewActivity : AppCompatActivity() {
                 if (isAutoScrollEnabled && isAtBottom) {
                     scrollToBottomWithAnimation()
                 }
+
+                // 更新TAG筛选器的TAG列表
+                updateTagFilterList()
             }
         }
     }
 
     private fun setupListeners() {
         // 日志类型筛选
-        binding.layoutLogType.setOnClickListener {
+        binding.btnLogType.setOnClickListener {
             toggleLogTypePopup()
         }
 
+        // TAG筛选
+        binding.btnTagFilter.setOnClickListener {
+            toggleTagFilterPopup()
+        }
+
         // 清空日志
-        binding.layoutClear.setOnClickListener {
+        binding.btnClearLog.setOnClickListener {
             clearLogs()
-        }
-
-        // 导航按钮
-        binding.layoutTop.setOnClickListener {
-            scrollToTop()
-        }
-
-        binding.layoutBottom.setOnClickListener {
-            scrollToBottom()
-        }
-
-        // 自动滚动按钮
-        binding.fabAutoScroll.setOnClickListener {
-            toggleAutoScroll()
         }
 
     }
@@ -177,7 +172,7 @@ class LogViewActivity : AppCompatActivity() {
             adapter = LogTypeAdapter(object : LogTypeClickListener {
                 override fun onLogTypeClick(logTypeItem: LogTypeItem) {
                     logTypePopupWindow?.dismiss()
-                    binding.tvType.text = logTypeItem.type
+                    updateLogTypeIndicator(logTypeItem)
                     logAdapter.filterData(logType = logTypeItem.logType)
                     updateLogCount()
                 }
@@ -185,13 +180,89 @@ class LogViewActivity : AppCompatActivity() {
         }
     }
 
+    private fun updateLogTypeIndicator(item: LogTypeItem) {
+        binding.tvLogTypeIndicator.visibility = View.VISIBLE
+        binding.tvLogTypeIndicator.text = item.type.firstOrNull()?.toString() ?: ""
+    }
+
     private fun toggleLogTypePopup() {
         logTypePopupWindow?.let { popup ->
             if (popup.isShowing) {
                 popup.dismiss()
             } else {
-                popup.showAsDropDown(binding.layoutLogType)
+                popup.showAsDropDown(binding.btnLogType)
             }
+        }
+    }
+
+    private fun initTagFilterPopup() {
+        val popupBinding = LayoutTagFilterPopupBinding.inflate(layoutInflater)
+        tagFilterPopupWindow = PopupWindow(
+            popupBinding.root,
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            true
+        ).apply {
+            isOutsideTouchable = true
+            animationStyle = android.R.style.Animation_Dialog
+            isFocusable = true
+            setBackgroundDrawable(getDrawable(R.drawable.popup_window_bg))
+        }
+
+        tagFilterAdapter = TagFilterAdapter {
+            onTagFilterChanged()
+        }
+
+        popupBinding.recyclerViewTags.apply {
+            layoutManager = LinearLayoutManager(this@LogViewActivity)
+            adapter = tagFilterAdapter
+        }
+
+        // 全选按钮
+        popupBinding.tvSelectAll.setOnClickListener {
+            tagFilterAdapter.selectAll()
+        }
+
+        // 清空按钮
+        popupBinding.tvClearAll.setOnClickListener {
+            tagFilterAdapter.clearAll()
+        }
+    }
+
+    private fun toggleTagFilterPopup() {
+        tagFilterPopupWindow?.let { popup ->
+            if (popup.isShowing) {
+                popup.dismiss()
+            } else {
+                // 更新TAG列表
+                updateTagFilterList()
+                // 全宽显示在工具栏下方
+                popup.showAsDropDown(binding.toolbarCard, 0, 0)
+            }
+        }
+    }
+
+    private fun updateTagFilterList() {
+        val allTags = logAdapter.getAllTags()
+        if (allTags.isNotEmpty()) {
+            tagFilterAdapter.updateTags(allTags, selectedTags)
+        }
+    }
+
+    private fun onTagFilterChanged() {
+        selectedTags = tagFilterAdapter.getSelectedTags()
+        logAdapter.filterData(tags = selectedTags)
+        updateLogCount()
+        updateTagFilterButtonText()
+    }
+
+    private fun updateTagFilterButtonText() {
+        if (selectedTags.isEmpty()) {
+            binding.tvTagIndicator.visibility = View.GONE
+            binding.tvTagIndicator.text = ""
+        } else {
+            binding.tvTagIndicator.visibility = View.VISIBLE
+            binding.tvTagIndicator.text = "${selectedTags.size}"
         }
     }
 
@@ -215,10 +286,6 @@ class LogViewActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun scrollToTop() {
-        binding.logRecyclerView.smoothScrollToPosition(0)
-    }
-
     private fun scrollToBottom() {
         scrollToPosition(logAdapter.itemCount - 1)
     }
@@ -235,37 +302,6 @@ class LogViewActivity : AppCompatActivity() {
         layoutManager.smoothScrollToPosition(binding.logRecyclerView, null, position)
     }
 
-    private fun toggleAutoScroll() {
-        isAutoScrollEnabled = !isAutoScrollEnabled
-
-        if (isAutoScrollEnabled) {
-            binding.fabAutoScroll.setImageResource(R.drawable.ic_pause)
-            startAutoScroll()
-            Toast.makeText(this, getString(R.string.auto_scroll_enabled), Toast.LENGTH_SHORT).show()
-        } else {
-            binding.fabAutoScroll.setImageResource(R.drawable.ic_play)
-            stopAutoScroll()
-            Toast.makeText(this, getString(R.string.auto_scroll_disabled), Toast.LENGTH_SHORT)
-                .show()
-        }
-    }
-
-    private fun startAutoScroll() {
-        autoScrollJob = lifecycleScope.launch {
-            while (isActive && isAutoScrollEnabled) {
-                delay(2000) // 每2秒检查一次
-                if (isAtBottom) {
-                    scrollToBottom()
-                }
-            }
-        }
-    }
-
-    private fun stopAutoScroll() {
-        autoScrollJob?.cancel()
-        autoScrollJob = null
-    }
-
     private fun checkScrollPosition() {
         val layoutManager = binding.logRecyclerView.layoutManager as LinearLayoutManager
         val visibleItemCount = layoutManager.childCount
@@ -278,37 +314,17 @@ class LogViewActivity : AppCompatActivity() {
         isAtBottom = (lastVisibleItemPosition == totalItemCount - 1) &&
                 (visibleItemCount + firstVisibleItemPosition >= totalItemCount - 1)
 
-        // 更新按钮状态
-        updateButtonStates()
-
         // 如果从非底部状态变为底部状态，且开启自动滚动，则滚动到底部
         if (!wasAtBottom && isAtBottom && isAutoScrollEnabled) {
             scrollToBottom()
         }
     }
 
-    private fun updateButtonStates() {
-        val layoutManager = binding.logRecyclerView.layoutManager as LinearLayoutManager
-        val firstVisible = layoutManager.findFirstVisibleItemPosition()
-        val lastVisible = layoutManager.findLastVisibleItemPosition()
-        val totalItems = layoutManager.itemCount
-
-        // 更新按钮可用性
-        binding.layoutTop.alpha = if (firstVisible > 0) 1.0f else 0.5f
-        binding.layoutBottom.alpha = if (lastVisible < totalItems - 1) 1.0f else 0.5f
-    }
-
     private fun updateLogCount() {
         val count = logAdapter.itemCount
-        binding.tvLogCount.text = getString(R.string.log_count_format, count)
+        binding.etSearch.hint = "搜索... ($count)"
     }
 
-    private fun copyToClipboard(text: String) {
-        val clipboard = getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
-        val clip = android.content.ClipData.newPlainText("日志内容", text)
-        clipboard.setPrimaryClip(clip)
-        Toast.makeText(this, getString(R.string.log_copied), Toast.LENGTH_SHORT).show()
-    }
 
     private fun hideKeyboard() {
         val imm =
@@ -318,8 +334,8 @@ class LogViewActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        stopAutoScroll()
         logTypePopupWindow?.dismiss()
+        tagFilterPopupWindow?.dismiss()
     }
 
     companion object Companion {

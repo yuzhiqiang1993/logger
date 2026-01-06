@@ -26,4 +26,3 @@ enum class LogType(val level: Int) {
     // WTF（What a Terrible Failure），用于输出非常严重的错误信息，通常会导致应用中止运行。
     WTF(6)
 }
-    

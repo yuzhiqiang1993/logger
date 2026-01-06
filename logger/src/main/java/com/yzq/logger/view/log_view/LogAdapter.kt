@@ -33,6 +33,9 @@ internal class LogAdapter :
 
     private var filterKeyWord: String = ""
 
+    //过滤的TAG集合（空集合表示不过滤TAG）
+    private var filterTags: Set<String> = emptySet()
+
     //更新数据
     private fun diffData(newLogs: MutableList<ViewLogItem>) {
         if (logItems.isEmpty()) {
@@ -93,16 +96,18 @@ internal class LogAdapter :
 
     }
 
-    fun filterData(logType: LogType? = null, keyWord: String? = null) {
+    fun filterData(logType: LogType? = null, keyWord: String? = null, tags: Set<String>? = null) {
 
         val filterType = logType ?: this.filterType
         val filterKeyWord = keyWord ?: this.filterKeyWord
+        val filterTags = tags ?: this.filterTags
 
-        if (filterType == this.filterType && filterKeyWord == this.filterKeyWord) {
+        if (filterType == this.filterType && filterKeyWord == this.filterKeyWord && filterTags == this.filterTags) {
             return
         }
         this.filterType = filterType
         this.filterKeyWord = filterKeyWord
+        this.filterTags = filterTags
 
         val filterLogs = originData.filter {
             it.isMatch()
@@ -113,10 +118,17 @@ internal class LogAdapter :
 
 
     private fun ViewLogItem.isMatch(): Boolean {
-        return logType >= filterType && (filterKeyWord.isEmpty() || content.contains(
-            filterKeyWord
-        ))
+        val matchLogType = logType >= filterType
+        val matchKeyword = filterKeyWord.isEmpty() || content.contains(filterKeyWord)
+        val matchTag = filterTags.isEmpty() || filterTags.contains(tag)
+        return matchLogType && matchKeyword && matchTag
+    }
 
+    /**
+     * 获取所有不同的TAG
+     */
+    fun getAllTags(): Set<String> {
+        return originData.map { it.tag }.toSet()
     }
 
     fun clearData() {

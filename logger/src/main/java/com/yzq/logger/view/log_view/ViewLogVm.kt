@@ -52,8 +52,8 @@ internal class ViewLogVm private constructor() : ViewModel() {
         }
 
         viewModelScope.launch(Dispatchers.IO) {
-            val logStr = ViewLogFormatter.formatToStr(logType, tag, *content)
-            logsSharedFlow?.tryEmit(ViewLogItem(logType = logType, content = logStr))
+            val (tagStr, logStr) = ViewLogFormatter.formatWithTag(logType, tag, *content)
+            logsSharedFlow?.tryEmit(ViewLogItem(logType = logType, tag = tagStr, content = logStr))
         }
     }
 

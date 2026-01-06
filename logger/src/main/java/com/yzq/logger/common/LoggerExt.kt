@@ -43,10 +43,6 @@ internal fun doLog(logType: LogType, tag: String, msg: String) {
     }
 }
 
-internal fun String.isNotDir(): Boolean {
-    return !File(this).isDirectory
-}
-
 
 internal fun Long.toFormatTimestamp(): String = runCatching {
     val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault())

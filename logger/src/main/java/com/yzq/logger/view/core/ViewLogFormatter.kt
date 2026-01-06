@@ -16,13 +16,13 @@ internal object ViewLogFormatter :
 
 
     /**
-     * 格式化日志内容
+     * 格式化日志内容并返回tag
      * @param logType LogType
      * @param tag String
      * @param content Array<out Any>
-     * @return String
+     * @return Pair<String, String> (tag, formattedContent)
      */
-    override fun formatToStr(logType: LogType, tag: String, vararg content: Any): String {
+    fun formatWithTag(logType: LogType, tag: String, vararg content: Any): Pair<String, String> {
         val contentStr = parseContent(*content)
 
         val threadName =
@@ -31,8 +31,19 @@ internal object ViewLogFormatter :
             InternalViewLogConfig.showStackTrace.takeIf { it }
                 ?.let { Throwable().firstStackTraceInfo() }
 
+        val formattedContent = buildLogStr(tag, contentStr, threadName, System.currentTimeMillis(), traceInfo)
+        return Pair(tag, formattedContent)
+    }
 
-        return buildLogStr(tag, contentStr, threadName, System.currentTimeMillis(), traceInfo)
+    /**
+     * 格式化日志内容
+     * @param logType LogType
+     * @param tag String
+     * @param content Array<out Any>
+     * @return String
+     */
+    override fun formatToStr(logType: LogType, tag: String, vararg content: Any): String {
+        return formatWithTag(logType, tag, *content).second
     }
 
 

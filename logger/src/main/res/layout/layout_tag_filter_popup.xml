@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<androidx.appcompat.widget.LinearLayoutCompat
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/popup_window_bg"
+    android:maxHeight="400dp"
+    android:orientation="vertical"
+    android:padding="8dp"
+>
+
+    <!-- 标题栏 -->
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="8dp"
+    >
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="筛选 TAG"
+            android:textColor="@color/log_view_text_primary"
+            android:textSize="12sp"
+            android:textStyle="bold"
+        />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_clear_all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="4dp"
+            android:text="清空"
+            android:textColor="@color/log_view_text_secondary"
+            android:textSize="12sp"
+        />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_select_all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="4dp"
+            android:text="全选"
+            android:textColor="@color/log_view_text_secondary"
+            android:textSize="12sp"
+        />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/log_view_divider"
+    />
+
+    <!-- TAG列表 -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view_tags"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="4dp"
+    />
+
+</androidx.appcompat.widget.LinearLayoutCompat>

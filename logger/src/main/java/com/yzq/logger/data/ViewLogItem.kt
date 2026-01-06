@@ -12,5 +12,6 @@ import java.util.UUID
 internal class ViewLogItem(
     val id: String = UUID.randomUUID().toString(),
     val logType: LogType,
+    val tag: String,
     val content: String
 )
