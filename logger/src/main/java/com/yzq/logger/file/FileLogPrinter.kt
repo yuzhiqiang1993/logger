@@ -13,6 +13,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import java.lang.Thread.currentThread
+import kotlin.OptIn
 
 
 /**
@@ -65,19 +66,20 @@ class FileLogPrinter private constructor() : AbsPrinter(), AppStateListener {
         if (logType.level >= InternalFileLogConfig.minLevel.level) {
             //将日志加入到阻塞队列中，等待写入，如果队列满了，则丢弃，不会阻塞，不会抛出异常
             GlobalScope.launch(Dispatchers.IO) {
-                logFlow?.tryEmit(LogItem(
-                    if (tag.isEmpty()) InternalFileLogConfig.tag else tag,
-                    logType,
-                    System.currentTimeMillis(),
-                    content = content,
-                ).also {
-                    if (InternalFileLogConfig.showThreadInfo) {
-                        it.threadName = currentThread().name
-                    }
-                    if (InternalFileLogConfig.showStackTrace) {
-                        it.traceInfo = Throwable().firstStackTraceInfo()
-                    }
-                })
+                logFlow?.tryEmit(
+                    LogItem(
+                        if (tag.isEmpty()) InternalFileLogConfig.tag else tag,
+                        logType,
+                        System.currentTimeMillis(),
+                        content = content,
+                    ).also {
+                        if (InternalFileLogConfig.showThreadInfo) {
+                            it.threadName = currentThread().name
+                        }
+                        if (InternalFileLogConfig.showStackTrace) {
+                            it.traceInfo = Throwable().firstStackTraceInfo()
+                        }
+                    })
             }
         }
     }
@@ -103,7 +105,3 @@ class FileLogPrinter private constructor() : AbsPrinter(), AppStateListener {
 
 
 }
-
-
-
-

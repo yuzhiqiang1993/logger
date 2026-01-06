@@ -7,10 +7,10 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.PopupWindow
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -65,9 +65,8 @@ class LogViewActivity : AppCompatActivity() {
     }
 
     private fun setupStatusBar() {
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         window.statusBarColor = Color.WHITE
+        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
     }
 
     private fun initializeViews() {
