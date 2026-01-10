@@ -5,17 +5,16 @@
 # For more details, see
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# 保留 kotlin 元信息
+-dontwarn kotlin.**
+-keep class kotlin.Metadata { *; }
+-keep class kotlin.reflect.** { *; }
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# 保留 Logger 自身的包名，确保 stack trace 过滤逻辑正常工作
+-keepnames class com.yzq.logger.** { *; }
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# 保留源文件和行号信息，确保日志能打印出代码位置
+-keepattributes SourceFile,LineNumberTable
+
+# 保留泛型信息
+-keepattributes Signature
