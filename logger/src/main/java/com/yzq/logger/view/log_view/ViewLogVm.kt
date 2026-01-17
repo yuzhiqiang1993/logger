@@ -47,21 +47,27 @@ internal class ViewLogVm private constructor() : ViewModel() {
         }
     }
 
-    var logsSharedFlow: MutableSharedFlow<ViewLogItem>? = null
+    val logsSharedFlow = MutableSharedFlow<ViewLogItem>(
+        replay = InternalViewLogConfig.cacheSize,
+        extraBufferCapacity = 0,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
 
     init {
         // 启动协程处理所有日志格式化，避免频繁创建协程
         viewModelScope.launch(Dispatchers.IO) {
             logInputChannel.receiveAsFlow().collect { input ->
-                if (logsSharedFlow == null) {
-                    logsSharedFlow = MutableSharedFlow(
-                        replay = InternalViewLogConfig.cacheSize,
-                        extraBufferCapacity = 0,
-                        onBufferOverflow = BufferOverflow.DROP_OLDEST
+                val logInfo = ViewLogFormatter.parseLogInfo(input.logType, input.tag, *input.content)
+                logsSharedFlow.tryEmit(
+                    ViewLogItem(
+                        logType = input.logType,
+                        tag = logInfo.tag,
+                        content = logInfo.content,
+                        timestamp = logInfo.timestamp,
+                        threadName = logInfo.threadName,
+                        stackTrace = logInfo.traceInfo
                     )
-                }
-                val (tagStr, logStr) = ViewLogFormatter.formatWithTag(input.logType, input.tag, *input.content)
-                logsSharedFlow?.tryEmit(ViewLogItem(logType = input.logType, tag = tagStr, content = logStr))
+                )
             }
         }
     }

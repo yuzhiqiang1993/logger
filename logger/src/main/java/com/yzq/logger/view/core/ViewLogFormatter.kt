@@ -74,4 +74,32 @@ internal object ViewLogFormatter :
     }
 
 
+
+    data class LogInfo(
+        val tag: String,
+        val content: String,
+        val threadName: String?,
+        val traceInfo: String?,
+        val timestamp: Long
+    )
+
+    /**
+     * 解析日志信息
+     */
+    fun parseLogInfo(logType: LogType, tag: String, vararg content: Any): LogInfo {
+        val contentStr = parseContent(*content)
+        val threadName =
+            InternalViewLogConfig.showThreadInfo.takeIf { it }?.let { Thread.currentThread().name }
+        val traceInfo =
+            InternalViewLogConfig.showStackTrace.takeIf { it }
+                ?.let { Throwable().firstStackTraceInfo() }
+
+        return LogInfo(
+            tag = tag,
+            content = contentStr,
+            threadName = threadName,
+            traceInfo = traceInfo,
+            timestamp = System.currentTimeMillis()
+        )
+    }
 }

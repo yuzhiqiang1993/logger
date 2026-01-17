@@ -79,19 +79,38 @@ internal class LogAdapter :
 
     override fun onBindViewHolder(holder: LogViewHolder, position: Int) {
         val logItem = asyncDiffer.currentList[position]
+
+        // 设置基本信息
+        holder.binding.tvTime.text = com.yzq.logger.common.dateFormat.get()?.format(logItem.timestamp)
+        holder.binding.tvThread.text = "[${logItem.threadName ?: "unknown"}]"
+        holder.binding.tvTagLabel.text = logItem.tag
         holder.binding.tvLog.text = logItem.content
-        holder.binding.tvLog.setTextColor(getLogColor(logItem.logType))
+
+        // 设置颜色
+        val logColor = getLogColor(logItem.logType)
+        holder.binding.tvTagLabel.setTextColor(logColor)
+        holder.binding.tvLog.setTextColor(logColor)
+
+        // 设置堆栈信息
+        if (logItem.stackTrace.isNullOrEmpty()) {
+            holder.binding.tvStackTrace.visibility = android.view.View.GONE
+        } else {
+            holder.binding.tvStackTrace.visibility = android.view.View.VISIBLE
+            holder.binding.tvStackTrace.text = logItem.stackTrace
+        }
     }
 
+
+    // 展示的数据（filtered）
+    private var showData: MutableList<ViewLogItem> = mutableListOf()
 
     fun addData(it: ViewLogItem) {
         originData.add(it)
 
         if (it.isMatch()) {
+            showData.add(it)
             // 使用 AsyncListDiffer 异步更新
-            val newList = asyncDiffer.currentList.toMutableList()
-            newList.add(it)
-            asyncDiffer.submitList(newList)
+            asyncDiffer.submitList(ArrayList(showData))
         }
 
     }
@@ -109,12 +128,9 @@ internal class LogAdapter :
         this.filterKeyWord = filterKeyWord
         this.filterTags = filterTags
 
-        val filterLogs = originData.filter {
-            it.isMatch()
-        }
-
-        // 使用 AsyncListDiffer 异步计算 Diff
-        asyncDiffer.submitList(filterLogs.toMutableList())
+        showData.clear()
+        showData.addAll(originData.filter { it.isMatch() })
+        asyncDiffer.submitList(ArrayList(showData))
     }
 
 
@@ -134,6 +150,7 @@ internal class LogAdapter :
 
     fun clearData() {
         originData.clear()
+        showData.clear()
         asyncDiffer.submitList(emptyList())
     }
 

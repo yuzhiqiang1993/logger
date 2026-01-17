@@ -140,7 +140,7 @@
         android:layout_marginTop="8dp"
         android:clipToPadding="false"
         android:fadeScrollbars="false"
-        android:paddingBottom="80dp"
+
         android:scrollbarThumbVertical="@color/log_view_scrollbar_thumb"
         android:scrollbars="vertical"
         app:layout_constraintBottom_toBottomOf="parent"

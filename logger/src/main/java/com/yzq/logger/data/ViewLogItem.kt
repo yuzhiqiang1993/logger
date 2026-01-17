@@ -13,5 +13,8 @@ internal class ViewLogItem(
     val id: String = UUID.randomUUID().toString(),
     val logType: LogType,
     val tag: String,
-    val content: String
+    val content: String,
+    val timestamp: Long = System.currentTimeMillis(),
+    val threadName: String? = null,
+    val stackTrace: String? = null
 )

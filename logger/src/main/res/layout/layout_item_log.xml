@@ -1,24 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@android:color/white"
     android:orientation="vertical">
 
+    <!-- 头部信息栏: 时间 | 线程 | TAG -->
+    <com.google.android.flexbox.FlexboxLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="12dp"
+        android:paddingTop="8dp"
+        app:flexWrap="wrap"
+        app:alignItems="center">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="serif"
+            android:text="12:30:45.123"
+            android:textColor="#9E9E9E"
+            android:textSize="10sp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="4dp"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_thread"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="[main]"
+            android:textColor="#9E9E9E"
+            android:textSize="10sp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="4dp"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_tag_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_tag_chip"
+            android:paddingHorizontal="6dp"
+            android:paddingVertical="1dp"
+            android:text="TAG"
+            android:textColor="@color/log_view_text_primary"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp"/>
+
+    </com.google.android.flexbox.FlexboxLayout>
+
+    <!-- 日志内容 -->
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_log"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
+        android:fontFamily="monospace"
         android:lineSpacingExtra="2dp"
-        android:paddingHorizontal="8dp"
+        android:paddingHorizontal="12dp"
         android:paddingVertical="4dp"
+        android:text="Log Content"
         android:textColor="@color/log_view_text_primary"
         android:textSize="12sp" />
+
+    <!-- 堆栈信息 (默认隐藏) -->
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_stack_trace"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginBottom="8dp"
+        android:background="#F5F5F5"
+        android:fontFamily="monospace"
+        android:padding="8dp"
+        android:text="Stack Trace..."
+        android:textColor="#D32F2F"
+        android:textSize="10sp"
+        android:visibility="gone" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
+        android:layout_marginTop="4dp"
         android:background="@color/log_view_divider" />
 
 </androidx.appcompat.widget.LinearLayoutCompat>

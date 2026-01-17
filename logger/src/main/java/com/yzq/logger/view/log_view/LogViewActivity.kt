@@ -120,7 +120,7 @@ class LogViewActivity : AppCompatActivity() {
     private fun setupObservers() {
         // 观察日志数据变化
         lifecycleScope.launch {
-            logVm.logsSharedFlow?.collect { logItem ->
+            logVm.logsSharedFlow.collect { logItem ->
                 logAdapter.addData(logItem)
                 updateLogCount()
 
@@ -216,9 +216,22 @@ class LogViewActivity : AppCompatActivity() {
         }
 
         popupBinding.recyclerViewTags.apply {
-            layoutManager = LinearLayoutManager(this@LogViewActivity)
+            layoutManager = com.google.android.flexbox.FlexboxLayoutManager(this@LogViewActivity).apply {
+                flexDirection = com.google.android.flexbox.FlexDirection.ROW
+                flexWrap = com.google.android.flexbox.FlexWrap.WRAP
+                justifyContent = com.google.android.flexbox.JustifyContent.FLEX_START
+            }
             adapter = tagFilterAdapter
         }
+
+        // 搜索 Tag
+        popupBinding.etSearchTag.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                tagFilterAdapter.filter(s?.toString() ?: "")
+            }
+        })
 
         // 全选按钮
         popupBinding.tvSelectAll.setOnClickListener {
@@ -227,6 +240,7 @@ class LogViewActivity : AppCompatActivity() {
 
         // 清空按钮
         popupBinding.tvClearAll.setOnClickListener {
+            popupBinding.etSearchTag.text?.clear()
             tagFilterAdapter.clearAll()
         }
     }
@@ -279,7 +293,7 @@ class LogViewActivity : AppCompatActivity() {
             .setTitle(getString(R.string.clear_logs_title))
             .setMessage(getString(R.string.clear_logs_message))
             .setPositiveButton(getString(R.string.confirm)) { dialog, which ->
-                logVm.logsSharedFlow?.resetReplayCache()
+                logVm.logsSharedFlow.resetReplayCache()
                 logAdapter.clearData()
                 updateLogCount()
                 Toast.makeText(this, getString(R.string.logs_cleared), Toast.LENGTH_SHORT).show()

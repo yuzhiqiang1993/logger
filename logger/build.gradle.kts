@@ -38,4 +38,5 @@ dependencies {
     compileOnly(libs.xeonyu.application)
     implementation(libs.xeonyu.coroutine)
     implementation(libs.xeonyu.binding)
+    implementation(libs.flexbox.layout)
 }
