@@ -35,7 +35,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout.stable)
     implementation(libs.androidx.cardview)
 
-    api(libs.xeonyu.application)
+    compileOnly(libs.xeonyu.application)
     implementation(libs.xeonyu.coroutine)
     implementation(libs.xeonyu.binding)
 }

@@ -9,7 +9,9 @@ import com.yzq.logger.view.core.InternalViewLogConfig
 import com.yzq.logger.view.core.ViewLogFormatter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 
@@ -21,6 +23,11 @@ import kotlinx.coroutines.launch
 @Suppress("UNCHECKED_CAST")
 internal class ViewLogVm private constructor() : ViewModel() {
 
+    // 用于接收原始日志的 Channel
+    private val logInputChannel = Channel<RawLogInput>(
+        capacity = InternalViewLogConfig.cacheSize,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
 
     companion object {
 
@@ -42,22 +49,36 @@ internal class ViewLogVm private constructor() : ViewModel() {
 
     var logsSharedFlow: MutableSharedFlow<ViewLogItem>? = null
 
-    fun emitLog(logType: LogType, tag: String, vararg content: Any) {
-        if (logsSharedFlow == null) {
-            logsSharedFlow = MutableSharedFlow(
-                replay = InternalViewLogConfig.cacheSize,
-                extraBufferCapacity = 0,
-                onBufferOverflow = BufferOverflow.DROP_OLDEST
-            )
-        }
-
+    init {
+        // 启动协程处理所有日志格式化，避免频繁创建协程
         viewModelScope.launch(Dispatchers.IO) {
-            val (tagStr, logStr) = ViewLogFormatter.formatWithTag(logType, tag, *content)
-            logsSharedFlow?.tryEmit(ViewLogItem(logType = logType, tag = tagStr, content = logStr))
+            logInputChannel.receiveAsFlow().collect { input ->
+                if (logsSharedFlow == null) {
+                    logsSharedFlow = MutableSharedFlow(
+                        replay = InternalViewLogConfig.cacheSize,
+                        extraBufferCapacity = 0,
+                        onBufferOverflow = BufferOverflow.DROP_OLDEST
+                    )
+                }
+                val (tagStr, logStr) = ViewLogFormatter.formatWithTag(input.logType, input.tag, *input.content)
+                logsSharedFlow?.tryEmit(ViewLogItem(logType = input.logType, tag = tagStr, content = logStr))
+            }
         }
     }
 
+    fun emitLog(logType: LogType, tag: String, vararg content: Any) {
+        // 直接发送到 Channel，由后台协程统一处理
+        logInputChannel.trySend(RawLogInput(logType, tag, content))
+    }
 
+    /**
+     * 原始日志输入数据类
+     */
+    private data class RawLogInput(
+        val logType: LogType,
+        val tag: String,
+        val content: Array<out Any>
+    )
 }
 
 

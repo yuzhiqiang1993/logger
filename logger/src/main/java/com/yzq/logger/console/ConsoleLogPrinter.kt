@@ -12,6 +12,10 @@ import kotlin.math.min
  */
 class ConsoleLogPrinter private constructor() : AbsPrinter() {
 
+    // 使用 ThreadLocal 复用 StringBuilder，避免频繁创建
+    private val threadLocalBuilder = object : ThreadLocal<StringBuilder>() {
+        override fun initialValue(): StringBuilder = StringBuilder(4096)
+    }
 
     companion object {
 
@@ -37,32 +41,37 @@ class ConsoleLogPrinter private constructor() : AbsPrinter() {
 
         if (!InternalConsoleConfig.enable) return
         val finalTag = if (tag.isEmpty()) InternalConsoleConfig.tag else tag
-        //格式化后的内容
+        // 格式化后的内容
         val logStr = ConsoleLogFormatter.formatToStr(logType, finalTag, *content)
 
-        //控制台最大显示长度,必须在500到4000之间
+        // 控制台最大显示长度，必须在 500 到 4000 之间
         val max = InternalConsoleConfig.lineLength.coerceAtLeast(500).coerceAtMost(4000)
 
         val length = logStr.length
-        //显示到控制台
+        // 显示到控制台
         if (length > max) {
-            //多行显示
+            // 多行显示：先准备好所有分段（在锁外）
+            val segments = mutableListOf<String>()
+            val logBuilder = threadLocalBuilder.get()!!
+            logBuilder.clear()
+            
+            var startIndex = 0
+            while (startIndex < length) {
+                val endIndex = min(length, startIndex + max)
+                logBuilder.append(logStr, startIndex, endIndex)
+                segments.add(logBuilder.toString())
+                logBuilder.clear()
+                startIndex = endIndex
+            }
+            
+            // 只锁住打印操作，确保日志顺序（锁粒度更小）
             synchronized(this) {
-                //这里使用StringBuilder来拼接字符串，避免频繁创建String对象
-                val logBuilder = StringBuilder()
-                var startIndex = 0
-                var endIndex = max
-                while (startIndex < length) {
-                    endIndex = min(length, endIndex)
-                    logBuilder.append(logStr, startIndex, endIndex)
-                    doLog(logType, finalTag, logBuilder.toString())
-                    logBuilder.clear()
-                    startIndex += max
-                    endIndex = startIndex + max
+                segments.forEach { segment ->
+                    doLog(logType, finalTag, segment)
                 }
             }
         } else {
-            //单行显示
+            // 单行显示
             doLog(logType, finalTag, logStr)
         }
     }

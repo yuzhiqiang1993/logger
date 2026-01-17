@@ -26,34 +26,45 @@ import java.util.concurrent.locks.ReentrantLock
 internal object FileLogWriter : AppStateListener {
 
 
-    //日志文件的存储目录,默认是/data/user/0/com.xxx.xxxx/files/.log/
+    // 日志文件的存储目录,默认是/data/user/0/com.xxx.xxxx/files/.log/
     private var logFileDir = ""
 
 
-    //用于存放阻塞队列过来的日志
+    // 用于存放阻塞队列过来的日志
     private val logBufferList = mutableListOf<LogItem>()
 
 
-    //最后一次写入的时间
+    // 最后一次写入的时间
     private var lastWriteTime = System.currentTimeMillis()
 
-    //用于执行定时任务的定时器
+    // 用于执行定时任务的定时器
     private val interval = interval(
         InternalFileLogConfig.writeLogInterval,
         initialDelay = InternalFileLogConfig.writeLogInterval
     )
 
-    //存放日志文件的列表
+    // 存放日志文件的列表
     private var existLogFileList = listLogDirFiles()
 
-    //日志数据的锁
+    // 日志数据的锁
     private var logDataLock = ReentrantLock(true)
 
-    //写日志的锁
+    // 写日志的锁
     private var writeLogLock = ReentrantLock(true)
 
-    //更新文件列表的锁
+    // 更新文件列表的锁
     private val updateFileLock = ReentrantLock(true)
+
+    // 使用 ThreadLocal 缓存 SimpleDateFormat，避免频繁创建
+    private val fileNameFormatter = object : ThreadLocal<SimpleDateFormat>() {
+        override fun initialValue(): SimpleDateFormat {
+            return SimpleDateFormat("yyyy-MM-dd-HH", Locale.getDefault())
+        }
+    }
+
+    // 文件查找缓存：key = filePrefix, value = 当前使用的文件
+    // 每次批量写入开始时清空，避免过期问题
+    private val fileCache = mutableMapOf<String, File>()
 
 
     init {
@@ -131,30 +142,43 @@ internal object FileLogWriter : AppStateListener {
         }
         ThreadPoolManager.instance.ioThreadPoolExecutor.execute {
             lockBlock(writeLogLock) {
-
                 "开始写入日志，日志总条数：${tempLogList.size}".println()
-                val logBufferMap = tempLogList.groupBy {
-                    getOperateFile(it)
+                
+                // 清空文件缓存，确保每次批量写入都重新检查文件
+                fileCache.clear()
+                
+                // 先按时间前缀分组，减少 getOperateFile 的调用和文件列表遍历次数
+                val logsByPrefix = tempLogList.groupBy { getFilePrefix(it) }
+                
+                // 再为每个前缀分组获取目标文件
+                val logBufferMap = mutableMapOf<File, MutableList<LogItem>>()
+                logsByPrefix.forEach { (prefix, logs) ->
+                    val file = getOperateFileByPrefix(prefix, logs.first())
+                    logBufferMap.getOrPut(file) { mutableListOf() }.addAll(logs)
                 }
+                
                 "数据准备完毕：${logBufferMap.size}个文件需要写入".println()
 
                 logBufferMap.forEach { (file, logList) ->
                     doFileWrite(file, logList).call()
                 }
-//                    ThreadPoolManager.instance.ioThreadPoolExecutor.invokeAll(writeFileTask)
-//
-//                    logBufferMap.forEach {
-//                        doFileWrite(file,logli)
-//                    }
-
 
                 lastWriteTime = System.currentTimeMillis()
-
                 "文件写入操作全部完成".println()
-
             }
         }
+    }
 
+    /**
+     * 获取日志的文件前缀
+     */
+    private fun getFilePrefix(log: LogItem): String {
+        val logTime = fileNameFormatter.get()!!.format(log.timeMillis)
+        return if (InternalFileLogConfig.filePrefix.isNotEmpty()) {
+            "${InternalFileLogConfig.filePrefix}-${logTime}"
+        } else {
+            logTime
+        }
     }
 
     private fun doFileWrite(file: File, logList: List<LogItem>): Callable<Boolean> {
@@ -247,60 +271,60 @@ internal object FileLogWriter : AppStateListener {
      * @param filePrefix String
      * @return File?
      */
-    private fun getOperateFile(log: LogItem): File {
-
-//        "getOperateFile:${log.timeMillis}".println()
-        //当前年-月-日-时
-        val logTime = SimpleDateFormat(
-            "yyyy-MM-dd-HH", Locale.getDefault()
-        ).format(log.timeMillis)
-
-        //先确定文件名，规则为：文件名前缀-yyyy-MM-dd-HH-index.txt，例如：2024-01-14-14-1.txt
-        val filePrefix = if (InternalFileLogConfig.filePrefix.isNotEmpty()) {
-            "${InternalFileLogConfig.filePrefix}-${logTime}"
-        } else {
-            logTime
+    /**
+     * 根据前缀获取操作文件（优化版本，避免重复遍历）
+     */
+    private fun getOperateFileByPrefix(filePrefix: String, sampleLog: LogItem): File {
+        // 先检查缓存
+        fileCache[filePrefix]?.let { cachedFile ->
+            // 检查文件大小是否超限
+            if (cachedFile.length() <= InternalFileLogConfig.maxFileSize) {
+                return cachedFile
+            }
         }
 
-        //获取以当前时间点开头的文件列表
+        // 获取以当前时间点开头的文件列表
         val existTimeFileList =
             existLogFileList.filter { it.name.startsWith(filePrefix) && it.name.endsWith(".txt") }
 
         var fileIndex = 1
 
-        //如果不存在以当前时间点开头的文件，则创建一个
+        // 如果不存在以当前时间点开头的文件，则创建一个
         if (existTimeFileList.isEmpty()) {
             val newFile = File(logFileDir, "${filePrefix}-${fileIndex}.txt").also {
                 it.createNewFile()
             }
             updateExistLogFileList()
+            fileCache[filePrefix] = newFile
             return newFile
         }
 
-        //获取当前时间点文件名的最大index,实际上直接获取列表数量即可
+        // 获取当前时间点文件名的最大index
         fileIndex = existTimeFileList.size
         val operateFile = File(logFileDir, "${filePrefix}-$fileIndex.txt")
 
-        //这里判断下如果不存在要创建一下，避免不可预知的错误
+        // 这里判断下如果不存在要创建一下，避免不可预知的错误
         if (!operateFile.exists()) {
             operateFile.createNewFile()
             updateExistLogFileList()
         }
-        //如果文件大小未超过限制，则直接返回
+        // 如果文件大小未超过限制，则直接返回
         if (operateFile.length() <= InternalFileLogConfig.maxFileSize) {
+            fileCache[filePrefix] = operateFile
             return operateFile
         }
 
-        //创建一个新的文件
+        // 创建一个新的文件
         fileIndex = existTimeFileList.size + 1
         val newFile = File(logFileDir, "${filePrefix}-${fileIndex}.txt").also {
             it.createNewFile()
         }
         updateExistLogFileList()
+        fileCache[filePrefix] = newFile
 
         return newFile
-
     }
+
 
 
     private fun updateExistLogFileList() {

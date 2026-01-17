@@ -6,6 +6,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.yzq.application.AppContext
@@ -22,46 +23,43 @@ import com.yzq.logger.databinding.LayoutItemLogBinding
 
 internal class LogAdapter :
     RecyclerView.Adapter<LogAdapter.LogViewHolder>() {
-    //原始数据
+    // 原始数据
     private var originData: MutableList<ViewLogItem> = mutableListOf()
 
-    //列表显示的数据
-    private var logItems: MutableList<ViewLogItem> = mutableListOf()
+    // 使用 AsyncListDiffer 进行异步 Diff 计算
+    private val asyncDiffer = AsyncListDiffer(this, object : DiffUtil.ItemCallback<ViewLogItem>() {
+        override fun areItemsTheSame(oldItem: ViewLogItem, newItem: ViewLogItem): Boolean {
+            return oldItem.id == newItem.id
+        }
 
-    //过滤类型
+        override fun areContentsTheSame(oldItem: ViewLogItem, newItem: ViewLogItem): Boolean {
+            // 如果是同一个 item，内容肯定相同
+            return true
+        }
+    })
+
+    // 过滤类型
     private var filterType: LogType = LogType.VERBOSE
 
     private var filterKeyWord: String = ""
 
-    //过滤的TAG集合（空集合表示不过滤TAG）
+    // 过滤的 TAG 集合（空集合表示不过滤 TAG）
     private var filterTags: Set<String> = emptySet()
-
-    //更新数据
-    private fun diffData(newLogs: MutableList<ViewLogItem>) {
-        if (logItems.isEmpty()) {
-            logItems = newLogs
-            notifyDataSetChanged()
-            return
-        }
-
-        val calculateDiff = DiffUtil.calculateDiff(LogDiffCallback(logItems, newLogs), true)
-        logItems = newLogs
-        calculateDiff.dispatchUpdatesTo(this)
-
-
-    }
 
 
     inner class LogViewHolder(val binding: LayoutItemLogBinding) :
         RecyclerView.ViewHolder(binding.root) {
         init {
             binding.tvLog.setOnLongClickListener {
-                val clipboardManager =
-                    AppContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                val clip =
-                    ClipData.newPlainText("日志内容", logItems[bindingAdapterPosition].content)
-                clipboardManager.setPrimaryClip(clip)
-                Toast.makeText(AppContext, "当前日志已复制到剪切板", Toast.LENGTH_SHORT).show()
+                val position = bindingAdapterPosition
+                if (position in 0 until asyncDiffer.currentList.size) {
+                    val clipboardManager =
+                        AppContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    val clip =
+                        ClipData.newPlainText("日志内容", asyncDiffer.currentList[position].content)
+                    clipboardManager.setPrimaryClip(clip)
+                    Toast.makeText(AppContext, "当前日志已复制到剪切板", Toast.LENGTH_SHORT).show()
+                }
                 true
             }
         }
@@ -75,12 +73,12 @@ internal class LogAdapter :
     }
 
     override fun getItemCount(): Int {
-        return logItems.size
+        return asyncDiffer.currentList.size
     }
 
 
     override fun onBindViewHolder(holder: LogViewHolder, position: Int) {
-        val logItem = logItems[position]
+        val logItem = asyncDiffer.currentList[position]
         holder.binding.tvLog.text = logItem.content
         holder.binding.tvLog.setTextColor(getLogColor(logItem.logType))
     }
@@ -90,8 +88,10 @@ internal class LogAdapter :
         originData.add(it)
 
         if (it.isMatch()) {
-            logItems.add(it)
-            notifyItemInserted(logItems.size - 1)
+            // 使用 AsyncListDiffer 异步更新
+            val newList = asyncDiffer.currentList.toMutableList()
+            newList.add(it)
+            asyncDiffer.submitList(newList)
         }
 
     }
@@ -113,7 +113,8 @@ internal class LogAdapter :
             it.isMatch()
         }
 
-        diffData(filterLogs.toMutableList())
+        // 使用 AsyncListDiffer 异步计算 Diff
+        asyncDiffer.submitList(filterLogs.toMutableList())
     }
 
 
@@ -125,7 +126,7 @@ internal class LogAdapter :
     }
 
     /**
-     * 获取所有不同的TAG
+     * 获取所有不同的 TAG
      */
     fun getAllTags(): Set<String> {
         return originData.map { it.tag }.toSet()
@@ -133,9 +134,9 @@ internal class LogAdapter :
 
     fun clearData() {
         originData.clear()
-        logItems.clear()
-        diffData(mutableListOf())
+        asyncDiffer.submitList(emptyList())
     }
 
 
 }
+

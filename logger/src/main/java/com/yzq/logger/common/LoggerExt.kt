@@ -44,9 +44,15 @@ internal fun doLog(logType: LogType, tag: String, msg: String) {
 }
 
 
+// 使用 ThreadLocal 缓存 SimpleDateFormat，避免频繁创建对象
+private val timestampFormatter = object : ThreadLocal<SimpleDateFormat>() {
+    override fun initialValue(): SimpleDateFormat {
+        return SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault())
+    }
+}
+
 internal fun Long.toFormatTimestamp(): String = runCatching {
-    val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault())
-    formatter.format(this)
+    timestampFormatter.get()!!.format(this)
 }.getOrDefault(this.toString())
 
 //换行符

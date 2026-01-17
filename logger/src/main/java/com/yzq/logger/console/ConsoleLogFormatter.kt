@@ -13,6 +13,10 @@ import com.yzq.logger.core.ILogFormatter
  */
 internal object ConsoleLogFormatter : ILogFormatter {
 
+    // 使用 ThreadLocal 复用 StringBuilder，避免频繁创建
+    private val threadLocalBuilder = object : ThreadLocal<StringBuilder>() {
+        override fun initialValue(): StringBuilder = StringBuilder(4096)
+    }
 
     /**
      * 格式化日志内容
@@ -50,7 +54,9 @@ internal object ConsoleLogFormatter : ILogFormatter {
         timeMillis: Long?,
         traceInfo: String?,
     ): String {
-        val sb = StringBuilder()
+        val sb = threadLocalBuilder.get()!!
+        sb.clear()
+        
         if (InternalConsoleConfig.showBorder) {
             sb.appendLine("┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────")
             sb.appendLine(
@@ -64,7 +70,6 @@ internal object ConsoleLogFormatter : ILogFormatter {
                 }"
             )
             sb.appendLine("├───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────")
-//            sb.append(formatLogContent(contentStr, linePrefix = "│ "))
             sb.append(formatLogContent(contentStr))
             sb.appendLine("└───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────")
         } else {
