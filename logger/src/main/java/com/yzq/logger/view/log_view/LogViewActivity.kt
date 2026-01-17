@@ -102,8 +102,11 @@ class LogViewActivity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                binding.ivClearSearch.visibility =
-                    if (s?.isNotEmpty() == true) View.VISIBLE else View.GONE
+                binding.ivClearSearch.visibility = if (s?.isNotEmpty() == true) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
             }
         })
 
@@ -275,7 +278,7 @@ class LogViewActivity : AppCompatActivity() {
         androidx.appcompat.app.AlertDialog.Builder(this)
             .setTitle(getString(R.string.clear_logs_title))
             .setMessage(getString(R.string.clear_logs_message))
-            .setPositiveButton(getString(R.string.confirm)) { _, _ ->
+            .setPositiveButton(getString(R.string.confirm)) { dialog, which ->
                 logVm.logsSharedFlow?.resetReplayCache()
                 logAdapter.clearData()
                 updateLogCount()

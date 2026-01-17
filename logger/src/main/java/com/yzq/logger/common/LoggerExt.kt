@@ -98,7 +98,9 @@ internal fun formatLogHeader(
     }
 
     //去掉最后一个spaceLine
-    sb.delete(sb.length - spaceLine.length, sb.length)
+    if (sb.length >= spaceLine.length) {
+        sb.delete(sb.length - spaceLine.length, sb.length)
+    }
 
     return sb.toString()
 }

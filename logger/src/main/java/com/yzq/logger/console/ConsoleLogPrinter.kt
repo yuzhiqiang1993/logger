@@ -40,7 +40,9 @@ class ConsoleLogPrinter private constructor() : AbsPrinter() {
     ) {
 
         if (!InternalConsoleConfig.enable) return
-        val finalTag = if (tag.isEmpty()) InternalConsoleConfig.tag else tag
+        val finalTag = tag.ifEmpty {
+            InternalConsoleConfig.tag
+        }
         // 格式化后的内容
         val logStr = ConsoleLogFormatter.formatToStr(logType, finalTag, *content)
 

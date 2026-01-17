@@ -63,8 +63,11 @@ class FileLogPrinter private constructor() : AbsPrinter(), AppStateListener {
 
         if (logType.level >= InternalFileLogConfig.minLevel.level) {
             // 直接在当前线程调用，避免创建协程的开销
+            val finalTag = tag.ifEmpty {
+                InternalFileLogConfig.tag
+            }
             val logItem = LogItem(
-                if (tag.isEmpty()) InternalFileLogConfig.tag else tag,
+                finalTag,
                 logType,
                 System.currentTimeMillis(),
                 content = content,

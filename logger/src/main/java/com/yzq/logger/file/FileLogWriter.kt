@@ -119,7 +119,7 @@ internal object FileLogWriter : AppStateListener {
         lockBlock(logDataLock) {
 
             "logBufferList数量，${logBufferList.size}".println()
-            if (logBufferList.size == 0) {
+            if (logBufferList.isEmpty()) {
                 return@lockBlock
             }
             //把logBufferList的数据存到一个list中
@@ -136,7 +136,7 @@ internal object FileLogWriter : AppStateListener {
     }
 
     private fun flushLog(tempLogList: MutableList<LogItem>) {
-        if (tempLogList.size == 0) {
+        if (tempLogList.isEmpty()) {
             "满足写入条件，但是日志数量为0，不写入".println()
             return
         }

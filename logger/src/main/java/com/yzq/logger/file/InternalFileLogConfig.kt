@@ -7,7 +7,7 @@ import com.yzq.logger.core.AbsLogConfig
  * @description: 文件日志配置类 Builder 模式
  * @author: yuzhiqiang
  */
-object InternalFileLogConfig : AbsLogConfig() {
+internal object InternalFileLogConfig : AbsLogConfig() {
 
     // 日志文件的存储目录
     var dirName: String = FileLogConstant.dirName
