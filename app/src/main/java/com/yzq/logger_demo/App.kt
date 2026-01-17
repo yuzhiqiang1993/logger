@@ -1,7 +1,6 @@
 package com.yzq.logger_demo
 
 import android.app.Application
-import com.yzq.application.AppManager
 import com.yzq.coroutine.interval.interval
 import com.yzq.logger.Logger
 import com.yzq.logger.console.ConsoleLogConfig
@@ -16,9 +15,6 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        AppManager.init(this, BuildConfig.DEBUG)
-
-
         val consoleLogPrinter = ConsoleLogPrinter.getInstance(
             ConsoleLogConfig.Builder().enable(true).showStackTrace(true).showThreadInfo(true)
                 .lineLength(1000).showBorder(true).tag("customeTag").build()
@@ -28,15 +24,16 @@ class App : Application() {
                 .memoryCacheSize(100).build()
         )
 
-
         val viewLogPrinter = ViewLogPrinter.getInstance(
             ViewLogConfig.Builder().enable(true).showStackTrace(false).showThreadInfo(true)
                 .cacheSize(10).build()
         )
 
-
-        Logger.addPrinter(consoleLogPrinter).addPrinter(fileLogPrinter).addPrinter(viewLogPrinter)
-            .debug(true)
+        // 使用 Logger.init() 初始化，内部会自动初始化 AppManager
+        Logger.init(this, BuildConfig.DEBUG)
+            .addPrinter(consoleLogPrinter)
+            .addPrinter(fileLogPrinter)
+            .addPrinter(viewLogPrinter)
 
 
         Logger.i("Logger", "开始打印不同等级的日志")

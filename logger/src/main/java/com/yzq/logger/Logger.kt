@@ -1,7 +1,9 @@
 package com.yzq.logger
 
+import android.app.Application
 import android.content.Intent
 import com.yzq.application.AppContext
+import com.yzq.application.AppManager
 import com.yzq.logger.common.LogType
 import com.yzq.logger.core.AbsPrinter
 import com.yzq.logger.core.loggerDebug
@@ -21,6 +23,20 @@ object Logger {
 
     private val printerList = Collections.synchronizedList(arrayListOf<AbsPrinter>())
 
+    /**
+     * 初始化 Logger
+     * 需要在 Application.onCreate 中调用
+     *
+     * @param application Application 实例
+     * @param isDebug 是否为调试模式，建议传入 BuildConfig.DEBUG
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun init(application: Application, isDebug: Boolean = false): Logger {
+        AppManager.init(application, isDebug)
+        loggerDebug = isDebug
+        return this
+    }
 
     fun debug(debug: Boolean): Logger {
         loggerDebug = debug

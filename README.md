@@ -70,11 +70,11 @@ class App : Application() {
                 .build()
         )
 
-        // 4. 添加打印器到 Logger
-        Logger.addPrinter(consoleLogPrinter)
+        // 4. 初始化 Logger 并添加打印器
+        Logger.init(this, BuildConfig.DEBUG)  // 初始化，传入 Application 和调试模式标志
+            .addPrinter(consoleLogPrinter)
             .addPrinter(fileLogPrinter)
             .addPrinter(viewLogPrinter)
-            .debug(BuildConfig.DEBUG) // 设置为调试模式
     }
 }
 ```
